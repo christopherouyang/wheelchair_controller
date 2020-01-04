@@ -177,7 +177,7 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
     }
 }
 
-void MainWindow::on_pushButton_8_clicked()
+void MainWindow::on_pushButton_8_clicked() //轴去使能操作函数
 {
     // TODO: Add your control notification handler code here
     time_t t1,t2; //设置时间监控变量，在等待轴状态机变化时防止死循环使用
@@ -224,6 +224,49 @@ void MainWindow::on_pushButton_8_clicked()
     }
 }
 
+//执行定长运动以及连续
+void MainWindow::OnButtonDo()
+{
+    // TODO: Add your control notification handler code here
+    UpdateData(true);//刷新参数
+    short iret = 0;
+    unsigned short statemachine=0;
+    unsigned long errcode=0;
+    iret = nmcs_get_errcode(m_nConnectNo,2,&errcode);
+    if(errcode!=0)
+    {
+        MessageBox("总线错误","错误");
+        return;
+    }
+    iret = nmcs_get_axis_state_machine(m_nConnectNo,m_nAxis,&statemachine);
+    if (statemachine!=4)
+    {
+        MessageBox("轴状态机错误","错误");
+    return;
+    }
+    //注意：以上部分是总线控制方式，需要检测总线状态和轴状态机，以下部分总线控制方式和脉冲
+    控制方式共用
+    if (smc_check_done( m_nConnectNo,m_nAxis ) == 0) //已经在运动中
+        return;
+    iret = smc_set_equiv(m_nConnectNo, m_nAxis, 1);//设置脉冲当量
+    //设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
+    iret = smc_set_pulse_outmode(m_nConnectNo, m_nAxis, 0);
+    //设定单轴运动速度参数
+    smc_set_profile_unit(m_nConnectNo,m_nAxis,m_nSpeedMin,m_nSpeed,m_nAcc,m_nDec,m_nSpeedSt
+    op);
+    //设定 S 段时间
+    iret = smc_set_s_profile(m_nConnectNo,m_nAxis,0,m_nSPara);
+    if( m_nActionst == 0 )
+    {
+        iret = smc_pmove_unit(m_nConnectNo, m_nAxis, m_nPulse*(m_bLogic?1:-1), 0);//相对定长运动
+    }
+    else
+    {
+        iret = smc_vmove(m_nConnectNo, m_nAxis, m_bLogic?1:0); //恒速运动
+    }
+    UpdateData(false);
+}
+//执行清除指令位置，脉冲方式和总线方式一致
 
 //open io
 void MainWindow::on_pushButton_clicked()
