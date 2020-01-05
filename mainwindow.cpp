@@ -84,8 +84,8 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
     // TODO: Add your control notification handler code here
     time_t t1,t2; //设置时间监控变量，在等待轴状态机变化时防止死循环使用
     unsigned long errcode=0; //总线错误代码
-    unsigned short statemachine_0=0; //总线状态机
-    unsigned short statemachine_1=0; //总线状态机
+    short iret[2] = {0,0};
+    short statemachine[2]={0,0};
     int m_nConnectNo=0;
     nmcs_get_errcode(m_nConnectNo,2,&errcode); //获取总线状态
 
@@ -93,12 +93,12 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
     {
         if (ui->checkBox->isChecked() && ui->checkBox_2->isChecked())
         {
-            nmcs_set_axis_enable(m_nConnectNo,0);//设置0轴使能
-            nmcs_set_axis_enable(m_nConnectNo,1);//设置1轴使能
-            nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0);//获取0轴状态机
-            nmcs_get_axis_state_machine(m_nConnectNo,1,&statemachine_1);//获取0轴状态机
+            iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0);//设置0轴使能
+            iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0);//设置1轴使能
+            statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
+            statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
             t1=time(NULL); //设置时间
-            while(statemachine_1!=4 && statemachine_0!=4) //监控轴状态机的值，该值等于 4 表示轴状态机处于准备好状态
+            while(statemachine[0]==0 && statemachine[1]==0) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -106,12 +106,12 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                     ui->label_11->setText("0、1轴使能超时，请检查设备");
                     return;
                 }
-                nmcs_set_axis_enable(m_nConnectNo,0); //设置0轴使能
-                nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0); //获取0轴状态机
-                nmcs_set_axis_enable(m_nConnectNo,1); //设置1轴使能
-                nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_1); //获取1轴状态机
+                iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0); //设置0轴使能
+                statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0); //获取0轴状态机
+                iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0); //设置1轴使能
+                statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
             }
-            while(statemachine_0!=4 && statemachine_1==4) //监控轴状态机的值，该值等于 4 表示轴状态机处于准备好状态
+            while(statemachine[0]==0  && statemachine[1]==0) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -119,10 +119,10 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                     ui->label_11->setText("0轴使能超时，请检查设备");
                     return;
                 }
-                nmcs_set_axis_enable(m_nConnectNo,0); //设置0轴使能
-                nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0); //获取0轴状态机
+                iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0); //设置0轴使能
+                statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0); //获取0轴状态机
             }
-            while(statemachine_1!=4 && statemachine_0==4) //监控轴状态机的值，该值等于 4 表示轴状态机处于准备好状态
+            while(statemachine[1]==0 && statemachine[0]==0) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -130,17 +130,17 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                     ui->label_11->setText("1轴使能超时，请检查设备");
                     return;
                 }
-                nmcs_set_axis_enable(m_nConnectNo,1); //设置1轴使能
-                nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_1); //获取1轴状态机
+                iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0); //设置1轴使能
+                statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
             }
             ui->label_11->setText("0、1轴使能成功");
         }
         else if(ui->checkBox->isChecked())
         {
-            nmcs_set_axis_enable(m_nConnectNo,0);//设置指定0轴使能
-            nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0);//获取0轴状态机
+            iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0);//设置指定0轴使能
+            statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
             t1=time(NULL); //设置时间
-            while(statemachine_0!=4) //监控轴状态机的值，该值等于 4 表示轴状态机处于准备好状态
+            while(statemachine[0]==0 ) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -148,16 +148,16 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                     ui->label_11->setText("0轴使能超时，请检查设备");
                     return;
                 }
-            nmcs_set_axis_enable(m_nConnectNo,0); //设置轴使能
-            nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0); //获取0轴状态机
+            iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0); //设置0轴使能
+            statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0); //获取0轴状态机
             }
         }
         else if(ui->checkBox_2->isChecked())
         {
-            nmcs_set_axis_enable(m_nConnectNo,1);//设置指定1轴使能
-            nmcs_get_axis_state_machine(m_nConnectNo,1,&statemachine_1);//获取1轴状态机
+            iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0);//设置指定1轴使能
+            statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1);//获取1轴状态机
             t1=time(NULL); //设置时间
-            while(statemachine_0!=4) //监控轴状态机的值，该值等于 4 表示轴状态机处于准备好状态
+            while(statemachine[1]==0 ) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -165,8 +165,8 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                     ui->label_11->setText("1轴使能超时，请检查设备");
                 return;
                 }
-            nmcs_set_axis_enable(m_nConnectNo,1); //设置1轴使能
-            nmcs_get_axis_state_machine(m_nConnectNo,1,&statemachine_1); //获取1轴状态机
+            iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0); //设置1轴使能
+            statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
             }
         }
     }
@@ -182,38 +182,40 @@ void MainWindow::on_pushButton_8_clicked() //轴去使能操作函数
     // TODO: Add your control notification handler code here
     time_t t1,t2; //设置时间监控变量，在等待轴状态机变化时防止死循环使用
     unsigned long errcode=0; //总线错误代码
-    unsigned short statemachine_0=0; //总线状态机
-    unsigned short statemachine_1=0; //总线状态机
+//    unsigned short statemachine_0=0; //总线状态机
+//    unsigned short statemachine_1=0; //总线状态机
+    short iret[2] = {0,0};
+    short statemachine[2]={1,1};
     int m_nConnectNo=0;
     nmcs_get_errcode(m_nConnectNo,2,&errcode); //获取总线状态
     if(errcode==0)
     {
-        nmcs_set_axis_disable(m_nConnectNo,0);//设置0轴去使能
-        nmcs_set_axis_disable(m_nConnectNo,1);//设置1轴去使能
-        nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0);//获取0轴状态机
-        nmcs_get_axis_state_machine(m_nConnectNo,1,&statemachine_1);//获取1轴状态机
+        iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
+        iret[1] = smc_write_sevon_pin(m_nConnectNo,1,1);//设置1轴去使能
+        statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
+        statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
         t1=time(NULL); //设置时间
-        while(statemachine_0==4)
+        while(statemachine[0]==1)
         {
             t2=time(NULL);
             if(t2-t1 > 3) //3 秒时间防止死循环
             {
-                ui->label_11->setText("0、轴去使能失败，请检查设备");
+                ui->label_11->setText("0轴去使能失败，请检查设备");
                 return;
             }
-            nmcs_set_axis_disable(m_nConnectNo,0);//设置0轴去使能
-            nmcs_get_axis_state_machine(m_nConnectNo,0,&statemachine_0);//获取0轴状态机
+            iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
+            statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
         }
-        while(statemachine_1==4)
+        while(statemachine[0]==1)
         {
             t2=time(NULL);
             if(t2-t1 > 3) //3 秒时间防止死循环
             {
-                ui->label_11->setText("0、轴去使能失败，请检查设备");
+                ui->label_11->setText("1轴去使能失败，请检查设备");
                 return;
             }
-            nmcs_set_axis_disable(m_nConnectNo,1);//设置1轴去使能
-            nmcs_get_axis_state_machine(m_nConnectNo,1,&statemachine_1);//获取1轴状态机
+            iret[1] = smc_write_sevon_pin(m_nConnectNo,1,1);//设置1轴去使能
+            statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
         }
         ui->label_11->setText("0、1轴去使能");
     }
@@ -224,49 +226,49 @@ void MainWindow::on_pushButton_8_clicked() //轴去使能操作函数
     }
 }
 
-//执行定长运动以及连续
-void MainWindow::OnButtonDo()
-{
-    // TODO: Add your control notification handler code here
-    UpdateData(true);//刷新参数
-    short iret = 0;
-    unsigned short statemachine=0;
-    unsigned long errcode=0;
-    iret = nmcs_get_errcode(m_nConnectNo,2,&errcode);
-    if(errcode!=0)
-    {
-        MessageBox("总线错误","错误");
-        return;
-    }
-    iret = nmcs_get_axis_state_machine(m_nConnectNo,m_nAxis,&statemachine);
-    if (statemachine!=4)
-    {
-        MessageBox("轴状态机错误","错误");
-    return;
-    }
-    //注意：以上部分是总线控制方式，需要检测总线状态和轴状态机，以下部分总线控制方式和脉冲
-    控制方式共用
-    if (smc_check_done( m_nConnectNo,m_nAxis ) == 0) //已经在运动中
-        return;
-    iret = smc_set_equiv(m_nConnectNo, m_nAxis, 1);//设置脉冲当量
-    //设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-    iret = smc_set_pulse_outmode(m_nConnectNo, m_nAxis, 0);
-    //设定单轴运动速度参数
-    smc_set_profile_unit(m_nConnectNo,m_nAxis,m_nSpeedMin,m_nSpeed,m_nAcc,m_nDec,m_nSpeedSt
-    op);
-    //设定 S 段时间
-    iret = smc_set_s_profile(m_nConnectNo,m_nAxis,0,m_nSPara);
-    if( m_nActionst == 0 )
-    {
-        iret = smc_pmove_unit(m_nConnectNo, m_nAxis, m_nPulse*(m_bLogic?1:-1), 0);//相对定长运动
-    }
-    else
-    {
-        iret = smc_vmove(m_nConnectNo, m_nAxis, m_bLogic?1:0); //恒速运动
-    }
-    UpdateData(false);
-}
-//执行清除指令位置，脉冲方式和总线方式一致
+////执行定长运动以及连续
+//void MainWindow::OnButtonDo()
+//{
+//    // TODO: Add your control notification handler code here
+//    UpdateData(true);//刷新参数
+//    short iret = 0;
+//    unsigned short statemachine=0;
+//    unsigned long errcode=0;
+//    iret = nmcs_get_errcode(m_nConnectNo,2,&errcode);
+//    if(errcode!=0)
+//    {
+//        MessageBox("总线错误","错误");
+//        return;
+//    }
+//    iret = nmcs_get_axis_state_machine(m_nConnectNo,m_nAxis,&statemachine);
+//    if (statemachine!=4)
+//    {
+//        MessageBox("轴状态机错误","错误");
+//    return;
+//    }
+//    //注意：以上部分是总线控制方式，需要检测总线状态和轴状态机，以下部分总线控制方式和脉冲
+//    控制方式共用
+//    if (smc_check_done( m_nConnectNo,m_nAxis ) == 0) //已经在运动中
+//        return;
+//    iret = smc_set_equiv(m_nConnectNo, m_nAxis, 1);//设置脉冲当量
+//    //设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
+//    iret = smc_set_pulse_outmode(m_nConnectNo, m_nAxis, 0);
+//    //设定单轴运动速度参数
+//    smc_set_profile_unit(m_nConnectNo,m_nAxis,m_nSpeedMin,m_nSpeed,m_nAcc,m_nDec,m_nSpeedSt
+//    op);
+//    //设定 S 段时间
+//    iret = smc_set_s_profile(m_nConnectNo,m_nAxis,0,m_nSPara);
+//    if( m_nActionst == 0 )
+//    {
+//        iret = smc_pmove_unit(m_nConnectNo, m_nAxis, m_nPulse*(m_bLogic?1:-1), 0);//相对定长运动
+//    }
+//    else
+//    {
+//        iret = smc_vmove(m_nConnectNo, m_nAxis, m_bLogic?1:0); //恒速运动
+//    }
+//    UpdateData(false);
+//}
+////执行清除指令位置，脉冲方式和总线方式一致
 
 //open io
 void MainWindow::on_pushButton_clicked()

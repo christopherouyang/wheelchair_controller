@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-01-04T20:20:53. -->
+<!-- Written by QtCreator 4.11.0, 2020-01-04T22:27:43. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -285,8 +285,9 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/jue/Documents/SMC300系列/Liunx OS 控制器应用培训资料/培训例程/QtCreate+C++例程/例程/Demo_linux/Qt_Linux_Demo_0/Qt_Linux_Demo_0.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/jue/Documents/SMC300系列/Liunx OS 控制器应用培训资料/培训例程/QtCreate+C++例程/例程/Demo_linux/Qt_Linux_Demo_0/Qt_Linux_Demo_0.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Qt_Linux_Demo_02</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/jue/Wheelchair_controller/Qt_Linux_Demo_0/Qt_Linux_Demo_0.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/jue/Wheelchair_controller/Qt_Linux_Demo_0/Qt_Linux_Demo_0.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
