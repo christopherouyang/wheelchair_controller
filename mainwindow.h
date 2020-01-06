@@ -18,6 +18,11 @@ public:
     ~MainWindow();
 
 private slots:
+
+    void information_fail();
+
+    void information_success();
+
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
