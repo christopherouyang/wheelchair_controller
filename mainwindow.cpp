@@ -85,7 +85,7 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
     time_t t1,t2; //设置时间监控变量，在等待轴状态机变化时防止死循环使用
     unsigned long errcode=0; //总线错误代码
     short iret[2] = {0,0};
-    short statemachine[2]={0,0};
+    short statemachine[2]={1,1};
     int m_nConnectNo=0;
     nmcs_get_errcode(m_nConnectNo,2,&errcode); //获取总线状态
 
@@ -93,12 +93,13 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
     {
         if (ui->checkBox->isChecked() && ui->checkBox_2->isChecked())
         {
-            iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0);//设置0轴使能
-            iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0);//设置1轴使能
-            statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
-            statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
+            for(int i=0;i++;i<2)
+            {
+                iret[i] = smc_write_sevon_pin(m_nConnectNo,i,0);//设置0&1轴使能
+                statemachine[i]=smc_read_sevon_pin(m_nConnectNo,i);//获取0&1轴状态机
+            }
             t1=time(NULL); //设置时间
-            while(statemachine[0]==0 && statemachine[1]==0) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
+            while(statemachine[0]==1&& statemachine[1]==1) //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -111,7 +112,7 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                 iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0); //设置1轴使能
                 statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
             }
-            while(statemachine[0]==0  && statemachine[1]==0) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
+            while(statemachine[0]==1&& statemachine[1]==0) //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -122,7 +123,7 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
                 iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0); //设置0轴使能
                 statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0); //获取0轴状态机
             }
-            while(statemachine[1]==0 && statemachine[0]==0) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
+            while(statemachine[1]==1&& statemachine[0]==0) //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -140,7 +141,7 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
             iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0);//设置指定0轴使能
             statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
             t1=time(NULL); //设置时间
-            while(statemachine[0]==0 ) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
+            while(statemachine[0]==1) //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -151,13 +152,27 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
             iret[0] = smc_write_sevon_pin(m_nConnectNo,0,0); //设置0轴使能
             statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0); //获取0轴状态机
             }
+            iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0);//设置指定1轴使能
+            statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1);//获取1轴状态机
+            while(statemachine[1]==0)//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+            {
+                t2=time(NULL);
+                if(t2-t1 > 3) //3 秒时间防止死循环
+                {
+                    ui->label_11->setText("1轴去使能失败，请检查设备");
+                    return;
+                }
+                iret[1] = smc_write_sevon_pin(m_nConnectNo,1,1);//设置1轴去使能
+                statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
+            }
+            ui->label_11->setText("0轴使能成功");
         }
         else if(ui->checkBox_2->isChecked())
         {
             iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0);//设置指定1轴使能
             statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1);//获取1轴状态机
             t1=time(NULL); //设置时间
-            while(statemachine[1]==0 ) //监控轴状态机的值，该值等于1表示轴已经使能,等于0则表示该轴未使能
+            while(statemachine[1]==1) //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
             {
                 t2=time(NULL);
                 if(t2-t1 > 3) //3 秒时间防止死循环
@@ -168,6 +183,22 @@ void MainWindow::on_pushButton_12_clicked() //轴使能操作函数
             iret[1] = smc_write_sevon_pin(m_nConnectNo,1,0); //设置1轴使能
             statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
             }
+
+            iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
+            statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
+            while(statemachine[0]==0)//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+            {
+                t2=time(NULL);
+                if(t2-t1 > 3) //3 秒时间防止死循环
+                {
+                    ui->label_11->setText("0轴去使能失败，请检查设备");
+                    return;
+                }
+                iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
+                statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
+            }
+
+            ui->label_11->setText("1轴使能成功");
         }
     }
     else //总线不正常状态下不响应使能操作
@@ -185,17 +216,22 @@ void MainWindow::on_pushButton_8_clicked() //轴去使能操作函数
 //    unsigned short statemachine_0=0; //总线状态机
 //    unsigned short statemachine_1=0; //总线状态机
     short iret[2] = {0,0};
-    short statemachine[2]={1,1};
+    short statemachine[2]={0,0};
     int m_nConnectNo=0;
     nmcs_get_errcode(m_nConnectNo,2,&errcode); //获取总线状态
     if(errcode==0)
     {
-        iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
-        iret[1] = smc_write_sevon_pin(m_nConnectNo,1,1);//设置1轴去使能
-        statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
-        statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
+//        iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
+//        iret[1] = smc_write_sevon_pin(m_nConnectNo,1,1);//设置1轴去使能
+//        statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
+//        statemachine[1]=smc_read_sevon_pin(m_nConnectNo,1); //获取1轴状态机
+        for(int i=0;i++;i<=1)
+        {
+            iret[i] = smc_write_sevon_pin(m_nConnectNo,i,1);//设置0&1轴使能
+            statemachine[i]=smc_read_sevon_pin(m_nConnectNo,i);//获取0&1轴状态机
+        }
         t1=time(NULL); //设置时间
-        while(statemachine[0]==1)
+        while(statemachine[0]==0)//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
         {
             t2=time(NULL);
             if(t2-t1 > 3) //3 秒时间防止死循环
@@ -206,7 +242,7 @@ void MainWindow::on_pushButton_8_clicked() //轴去使能操作函数
             iret[0] = smc_write_sevon_pin(m_nConnectNo,0,1);//设置0轴去使能
             statemachine[0]=smc_read_sevon_pin(m_nConnectNo,0);//获取0轴状态机
         }
-        while(statemachine[0]==1)
+        while(statemachine[1]==0)//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
         {
             t2=time(NULL);
             if(t2-t1 > 3) //3 秒时间防止死循环
