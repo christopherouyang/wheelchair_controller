@@ -5,6 +5,8 @@
 #include <QtCore>
 #include "mythread.h"
 
+//extern short connection;
+
 namespace Ui {
 class MainWindow;
 }
@@ -35,7 +37,7 @@ private slots:
 
     void on_pushButton_stopcrd_clicked();
 
-    void on_pushButton_disable_clicked();
+    bool on_pushButton_disable_clicked();
 
     void on_pushButton_line_clicked();
 
@@ -48,6 +50,7 @@ private slots:
     void on_pushButton_exit_clicked();
 
 private:
+
     Ui::MainWindow *ui;
     void timerEvent(QTimerEvent *e);
     void initDialog();

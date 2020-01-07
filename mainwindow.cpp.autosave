@@ -4,14 +4,13 @@
 #include <QDebug>
 #include <QMessageBox>
 
-static short connection;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     initDialog();
+    extern short connection;
     connection = smc_board_init(0,2,"192.168.5.11",0);
     if(connection !=0)
     {
@@ -568,25 +567,16 @@ void MainWindow::on_pushButton_line_clicked()
 //exit board&application
 void MainWindow::on_pushButton_exit_clicked()
 {
-
+    bool disable_success = false;
     if (connection ==0)
-    {
-        bool disable_success = false;
-        disable_success = MainWindow::on_pushButton_disable_clicked();
-        if(disable_success == true)
-        {
-            smc_board_close(0);
-            qApp->exit(0);
-        }
-        else
-        {
-            return;
-        }
-    }
-    else
+    disable_success = MainWindow::on_pushButton_disable_clicked();
+    if(disable_success == true)
     {
         smc_board_close(0);
         qApp->exit(0);
     }
-
+    else
+    {
+        return;
+    }
 }
