@@ -7,7 +7,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    //QObject::connect(&w,&MainWindow::on_pushButton_exit,&a,&QApplication::quit);
-
     return a.exec();
 }
