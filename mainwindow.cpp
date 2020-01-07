@@ -52,10 +52,21 @@ void MainWindow::initDialog()
     ui->textEdit_destpos->setText("20000");
     ui->textEdit_pulse->setText("160000");
     ui->textEdit_PortNo->setText("0");
+
+    ui->textEdit_startvel_2->setText("100");
+    ui->textEdit_runvel_2->setText("16000");
+    ui->textEdit_stopvel_2->setText("100");
+    ui->textEdit_acctime_2->setText("0.1");
+    ui->textEdit_dectime_2->setText("0.1");
+    ui->textEdit_stime_2->setText("0.05");
+    ui->textEdit_destpos_2->setText("20000");
+    ui->textEdit_pulse_2->setText("160000");
+
     ui->checkBox_axis_l->click();
     ui->radioButton_fl->click();
     ui->checkBox_axis_0->click();
-    ui->listWidget_direction->setCurrentRow(0);
+    ui->radioButton_fw->click();
+    ui->radioButton_fw_2->click();
 }
 
 MainWindow::~MainWindow()
@@ -156,6 +167,8 @@ void MainWindow::timerEvent(QTimerEvent *e)
 
 }
 
+
+//IO 急停信号
 void MainWindow::emg_stop()
 {
     /*********************变量定义****************************/
@@ -385,15 +398,34 @@ void MainWindow::on_pushButton_closeio_clicked()
 //start
 void MainWindow::on_pushButton_start_clicked()
 {
-    double startvel = ui->textEdit_startvel->toPlainText().toDouble();
-    double runvel = ui->textEdit_runvel->toPlainText().toDouble();
-    double stopvel = ui->textEdit_stopvel->toPlainText().toDouble();
-    double acctime = ui->textEdit_acctime->toPlainText().toDouble();
-    double dectime = ui->textEdit_dectime->toPlainText().toDouble();
-    double stime = ui->textEdit_stime->toPlainText().toDouble();
+
+    double startvel[2] = {ui->textEdit_startvel->toPlainText().toDouble(),ui->textEdit_startvel_2->toPlainText().toDouble()};
+    double runvel[2] = {ui->textEdit_runvel->toPlainText().toDouble(),ui->textEdit_runvel_2->toPlainText().toDouble()};
+    double stopvel[2] = {ui->textEdit_stopvel->toPlainText().toDouble(),ui->textEdit_stopvel_2->toPlainText().toDouble()};
+    double acctime[2] = {ui->textEdit_acctime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
+    double dectime[2] = {ui->textEdit_dectime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
+    double stime[2] = {ui->textEdit_stime->toPlainText().toDouble(),ui->textEdit_stime_2->toPlainText().toDouble()};
     //double destpos = ui->textEdit_destpos->toPlainText().toDouble();
-    double pulse = ui->textEdit_pulse->toPlainText().toDouble();
-    int direction= ui->listWidget_direction->currentRow();
+    double pulse[2] = {ui->textEdit_pulse->toPlainText().toDouble(),ui->textEdit_pulse_2->toPlainText().toDouble()};
+    int direction[2];
+    if (ui->radioButton_fw->isChecked())
+    {
+        direction[0]=1;
+    }
+    else
+    {
+        direction[0]=0;
+    }
+
+    if (ui->radioButton_fw_2->isChecked())
+    {
+        direction[1]=1;
+    }
+    else
+    {
+        direction[1]=0;
+    }
+
     WORD axisNo[2] ={0,1};
     short iret[2] = {0,0};
     for(int i = 0; i < 2 ; i++)
@@ -405,15 +437,15 @@ void MainWindow::on_pushButton_start_clicked()
             iret[0] = smc_set_equiv( 0, axisNo[0], 1);//设置脉冲当量
             iret[0] = smc_set_alm_mode(0,axisNo[0],0,0,0); //设置报警使能,关闭报警
             iret[0] = smc_set_pulse_outmode(0 , axisNo[0], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-            iret[0] = smc_set_profile_unit(0,axisNo[0],startvel,runvel,acctime,dectime,stopvel);//设定单轴运动速度参数
-            iret[0] = smc_set_s_profile(0,axisNo[0],0,stime);
+            iret[0] = smc_set_profile_unit(0,axisNo[0],startvel[0],runvel[0],acctime[0],dectime[0],stopvel[0]);//设定单轴运动速度参数
+            iret[0] = smc_set_s_profile(0,axisNo[0],0,stime[0]);
             if(ui->radioButton_fl->isChecked())
             {
-                iret[0] = smc_pmove_unit(0,axisNo[0],pulse*(2*direction-1),0); //相对定长运动
+                iret[0] = smc_pmove_unit(0,axisNo[0],pulse[0]*(2*direction[0]-1),0); //相对定长运动
             }
             else
             {
-                iret[0] = smc_vmove(0,axisNo[0],direction); //恒速运动
+                iret[0] = smc_vmove(0,axisNo[0],direction[0]); //恒速运动
             }
         }
         if(ui->checkBox_axis_r->isChecked())
@@ -421,15 +453,15 @@ void MainWindow::on_pushButton_start_clicked()
             iret[1] = smc_set_equiv( 0, axisNo[1], 1);//设置脉冲当量
             iret[1] = smc_set_alm_mode(0,axisNo[1],0,0,0); //设置报警使能,关闭报警
             iret[1] = smc_set_pulse_outmode(0 , axisNo[1], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-            iret[1] = smc_set_profile_unit(0,axisNo[1],startvel,runvel,acctime,dectime,stopvel);//设定单轴运动速度参数
-            iret[1] = smc_set_s_profile(0,axisNo[1],0,stime);
+            iret[1] = smc_set_profile_unit(0,axisNo[1],startvel[1],runvel[1],acctime[1],dectime[1],stopvel[1]);//设定单轴运动速度参数
+            iret[1] = smc_set_s_profile(0,axisNo[1],0,stime[1]);
             if(ui->radioButton_fl->isChecked())
             {
-                iret[1] = smc_pmove_unit(0,axisNo[1],pulse*(2*direction-1),0); //相对定长运动
+                iret[1] = smc_pmove_unit(0,axisNo[1],pulse[1]*(2*direction[1]-1),0); //相对定长运动
             }
             else
             {
-                iret[i] = smc_vmove(0,axisNo[1],direction); //恒速运动
+                iret[i] = smc_vmove(0,axisNo[1],direction[1]); //恒速运动
             }
         }
         }
@@ -439,20 +471,20 @@ void MainWindow::on_pushButton_start_clicked()
 void MainWindow::on_pushButton_decstop_clicked()
 {
 
-    double dectime = ui->textEdit_dectime->toPlainText().toDouble();
-
+    //double dectime = ui->textEdit_dectime->toPlainText().toDouble();
+    double dectime[2] = {ui->textEdit_dectime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
     short axisNo = 0 ;
     short iret=0;
     if(ui->checkBox_axis_l->isChecked())
     {
         axisNo =0;
-        smc_set_dec_stop_time(0,axisNo,dectime);//设置10ms减速停止时间
+        smc_set_dec_stop_time(0,axisNo,dectime[0]);//设置10ms减速停止时间
         iret =smc_stop(0,axisNo,0);//减速停止
     }
     if(ui->checkBox_axis_r->isChecked())
     {
         axisNo =1;
-        smc_set_dec_stop_time(0,axisNo,dectime);//设置10ms减速停止时间
+        smc_set_dec_stop_time(0,axisNo,dectime[1]);//设置10ms减速停止时间
         iret =smc_stop(0,axisNo,0);//减速停止
     }
 }
@@ -518,16 +550,16 @@ void MainWindow::on_pushButton_changevel_clicked()
 {
     WORD axisNo=0;
     short iret=0;
-    double runvel = ui->textEdit_runvel->toPlainText().toDouble();
+    double runvel[2] = {ui->textEdit_runvel->toPlainText().toDouble(),ui->textEdit_runvel_2->toPlainText().toDouble()};
     if(ui->checkBox_axis_l->isChecked())
     {
         axisNo =0;
-        iret =smc_change_speed_unit(0,axisNo,runvel,0);
+        iret =smc_change_speed_unit(0,axisNo,runvel[0],0);
     }
     if(ui->checkBox_axis_r->isChecked())
     {
         axisNo =1;
-        iret =smc_change_speed_unit(0,axisNo,runvel,0);
+        iret =smc_change_speed_unit(0,axisNo,runvel[1],0);
     }
 }
 //change pos
@@ -535,16 +567,16 @@ void MainWindow::on_pushButton_changepos_clicked()
 {
     WORD axisNo=0;
     short iret=0;
-    double destpos = ui->textEdit_destpos->toPlainText().toDouble();
+    double destpos[2] = {ui->textEdit_destpos->toPlainText().toDouble(),ui->textEdit_destpos_2->toPlainText().toDouble()};
     if(ui->checkBox_axis_l->isChecked())
     {
         axisNo =0;
-        iret =smc_reset_target_position_unit(0,axisNo,destpos);
+        iret =smc_reset_target_position_unit(0,axisNo,destpos[0]);
     }
     if(ui->checkBox_axis_r->isChecked())
     {
         axisNo =1;
-        iret =smc_reset_target_position_unit(0,axisNo,destpos);
+        iret =smc_reset_target_position_unit(0,axisNo,destpos[1 ]);
     }
 
 }
