@@ -135,8 +135,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>260</y>
-      <width>401</width>
+      <y>240</y>
+      <width>521</width>
       <height>201</height>
      </rect>
     </property>
@@ -325,11 +325,70 @@
       <bool>false</bool>
      </property>
     </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>170</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>pulse</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_pulse">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>160</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_21">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>60</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>direction</string>
+     </property>
+    </widget>
+    <widget class="QListWidget" name="listWidget_direction">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>90</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>backward</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>forward</string>
+      </property>
+     </item>
+    </widget>
    </widget>
    <widget class="QTextEdit" name="textEdit_PortNo">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>560</x>
       <y>30</y>
       <width>31</width>
       <height>31</height>
@@ -342,7 +401,7 @@
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>560</x>
       <y>0</y>
       <width>76</width>
       <height>19</height>
@@ -352,20 +411,7 @@
      <string>Port No</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>130</y>
-      <width>100</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Open IO</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="pushButton_openio">
     <property name="geometry">
      <rect>
       <x>550</x>
@@ -375,10 +421,23 @@
      </rect>
     </property>
     <property name="text">
+     <string>Open IO</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_closeio">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>130</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
      <string>Close IO</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="pushButton_start">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -391,7 +450,7 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_4">
+   <widget class="QPushButton" name="pushButton_stop">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -401,10 +460,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Stop</string>
+     <string>EMG Stop</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_5">
+   <widget class="QPushButton" name="pushButton_zeropos">
     <property name="geometry">
      <rect>
       <x>270</x>
@@ -417,7 +476,7 @@
      <string>ZeroPos</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_6">
+   <widget class="QPushButton" name="pushButton_encpos">
     <property name="geometry">
      <rect>
       <x>400</x>
@@ -430,7 +489,7 @@
      <string>EncPos</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_7">
+   <widget class="QPushButton" name="pushButton_stopcrd">
     <property name="geometry">
      <rect>
       <x>530</x>
@@ -443,59 +502,7 @@
      <string>StopCrd</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_8">
-    <property name="geometry">
-     <rect>
-      <x>440</x>
-      <y>80</y>
-      <width>100</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Disable</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_9">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>530</y>
-      <width>100</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Line</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_10">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>530</y>
-      <width>100</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ChangeVel</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_11">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>530</y>
-      <width>100</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ChangePos</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_12">
+   <widget class="QPushButton" name="pushButton_disable">
     <property name="geometry">
      <rect>
       <x>440</x>
@@ -505,10 +512,62 @@
      </rect>
     </property>
     <property name="text">
+     <string>Disable</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_line">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>520</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Line</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_changevel">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>520</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ChangeVel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_changepos">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>520</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ChangePos</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_enable">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>80</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
      <string>Enable</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_11">
+   <widget class="QLabel" name="label_error">
     <property name="geometry">
      <rect>
       <x>360</x>
@@ -524,7 +583,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="checkBox_axis_0">
     <property name="geometry">
      <rect>
       <x>360</x>
@@ -537,7 +596,7 @@
      <string>Axis 0</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_2">
+   <widget class="QCheckBox" name="checkBox_axis_1">
     <property name="geometry">
      <rect>
       <x>360</x>
@@ -550,7 +609,7 @@
      <string>Axis 1</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_12">
+   <widget class="QLabel" name="label_status">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -563,7 +622,7 @@
      <string>status</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_14">
+   <widget class="QLabel" name="label_status_0">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -582,12 +641,12 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_15">
+   <widget class="QLabel" name="label_status_1">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>240</x>
       <y>160</y>
-      <width>101</width>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -601,7 +660,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_3">
+   <widget class="QCheckBox" name="checkBox_axis_l">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -614,7 +673,7 @@
      <string>Axis Left</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_4">
+   <widget class="QCheckBox" name="checkBox_axis_r">
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -630,7 +689,7 @@
    <widget class="QLabel" name="label_16">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>360</x>
       <y>0</y>
       <width>41</width>
       <height>19</height>
@@ -640,10 +699,10 @@
      <string>Mode</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QRadioButton" name="radioButton_fl">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>360</x>
       <y>20</y>
       <width>112</width>
       <height>23</height>
@@ -653,10 +712,10 @@
      <string>Fixed Length</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QRadioButton" name="radioButton_cs">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>360</x>
       <y>50</y>
       <width>131</width>
       <height>23</height>
@@ -666,7 +725,7 @@
      <string>Constant Speed</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_17">
+   <widget class="QLabel" name="label_mode">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -679,7 +738,7 @@
      <string>Mode</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_18">
+   <widget class="QLabel" name="label_mode_0">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -698,12 +757,12 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_19">
+   <widget class="QLabel" name="label_mode_1">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>240</x>
       <y>200</y>
-      <width>101</width>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -717,6 +776,72 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>351</width>
+      <height>221</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Current Status</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_decstop">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>520</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dec Stop</string>
+    </property>
+   </widget>
+   <zorder>groupBox_2</zorder>
+   <zorder>textEdit_prfPosX</zorder>
+   <zorder>label</zorder>
+   <zorder>textEdit_prfPosY</zorder>
+   <zorder>textEdit_encPosY</zorder>
+   <zorder>label_2</zorder>
+   <zorder>textEdit_encPosX</zorder>
+   <zorder>textEdit_SpeedX</zorder>
+   <zorder>label_3</zorder>
+   <zorder>textEdit_SpeedY</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>textEdit_PortNo</zorder>
+   <zorder>label_13</zorder>
+   <zorder>pushButton_openio</zorder>
+   <zorder>pushButton_closeio</zorder>
+   <zorder>pushButton_start</zorder>
+   <zorder>pushButton_stop</zorder>
+   <zorder>pushButton_zeropos</zorder>
+   <zorder>pushButton_encpos</zorder>
+   <zorder>pushButton_stopcrd</zorder>
+   <zorder>pushButton_disable</zorder>
+   <zorder>pushButton_line</zorder>
+   <zorder>pushButton_changevel</zorder>
+   <zorder>pushButton_changepos</zorder>
+   <zorder>pushButton_enable</zorder>
+   <zorder>label_error</zorder>
+   <zorder>checkBox_axis_0</zorder>
+   <zorder>checkBox_axis_1</zorder>
+   <zorder>label_status</zorder>
+   <zorder>label_status_0</zorder>
+   <zorder>label_status_1</zorder>
+   <zorder>checkBox_axis_l</zorder>
+   <zorder>checkBox_axis_r</zorder>
+   <zorder>label_16</zorder>
+   <zorder>radioButton_fl</zorder>
+   <zorder>radioButton_cs</zorder>
+   <zorder>label_mode</zorder>
+   <zorder>label_mode_0</zorder>
+   <zorder>label_mode_1</zorder>
+   <zorder>pushButton_decstop</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

@@ -19,38 +19,39 @@ public:
 
 private slots:
 
-    void information_fail();
+    void on_pushButton_openio();
 
-    void information_success();
+    void on_pushButton_closeio();
 
-    void on_pushButton_clicked();
+    void on_pushButton_start();
 
-    void on_pushButton_2_clicked();
+    void on_pushButton_decstop();
 
-    void on_pushButton_3_clicked();
+    void on_pushButton_emgstop();
 
-    void on_pushButton_4_clicked();
+    void on_pushButton_zeropos();
 
-    void on_pushButton_5_clicked();
+    void on_pushButton_encpos();
 
-    void on_pushButton_6_clicked();
+    void on_pushButton_stopcrd();
 
-    void on_pushButton_7_clicked();
+    void on_pushButton_disable();
 
-    void on_pushButton_8_clicked();
+    void on_pushButton_line();
 
-    void on_pushButton_9_clicked();
+    void on_pushButton_changevel();
 
-    void on_pushButton_10_clicked();
+    void on_pushButton_changepos();
 
-    void on_pushButton_11_clicked();
-
-    void on_pushButton_12_clicked();
+    void on_pushButton_enable();
 
 private:
     Ui::MainWindow *ui;
     void timerEvent(QTimerEvent *e);
     void initDialog();
+    void information_fail();
+    void information_success();
+    void emg_stop();
 
 public:
     void RefreshUI();
