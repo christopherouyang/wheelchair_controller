@@ -19,31 +19,33 @@ public:
 
 private slots:
 
-    void on_pushButton_openio();
+    void on_pushButton_openio_clicked();
 
-    void on_pushButton_closeio();
+    void on_pushButton_closeio_clicked();
 
-    void on_pushButton_start();
+    void on_pushButton_start_clicked();
 
-    void on_pushButton_decstop();
+    void on_pushButton_decstop_clicked();
 
-    void on_pushButton_emgstop();
+    void on_pushButton_emgstop_clicked();
 
-    void on_pushButton_zeropos();
+    void on_pushButton_zeropos_clicked();
 
-    void on_pushButton_encpos();
+    void on_pushButton_encpos_clicked();
 
-    void on_pushButton_stopcrd();
+    void on_pushButton_stopcrd_clicked();
 
-    void on_pushButton_disable();
+    void on_pushButton_disable_clicked();
 
-    void on_pushButton_line();
+    void on_pushButton_line_clicked();
 
-    void on_pushButton_changevel();
+    void on_pushButton_changevel_clicked();
 
-    void on_pushButton_changepos();
+    void on_pushButton_changepos_clicked();
 
-    void on_pushButton_enable();
+    void on_pushButton_enable_clicked();
+
+    void on_pushButton_exit_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -55,6 +57,7 @@ private:
 
 public:
     void RefreshUI();
+
 };
 
 #endif // MAINWINDOW_H

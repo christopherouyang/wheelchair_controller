@@ -43,7 +43,7 @@ void MainWindow::initDialog()
 {
     ui->textEdit_startvel->setText("100");
     ui->textEdit_runvel->setText("16000");
-    ui->textEdit_stopvel->setText("200");
+    ui->textEdit_stopvel->setText("100");
     ui->textEdit_acctime->setText("0.1");
     ui->textEdit_dectime->setText("0.1");
     ui->textEdit_stime->setText("0.05");
@@ -184,7 +184,7 @@ void MainWindow::emg_stop()
 //    ret =smc_pmove_unit(MyCardNo,Myaxis,10000,1);
 }
 
-void MainWindow::on_pushButton_enable() //轴使能操作函数
+void MainWindow::on_pushButton_enable_clicked() //轴使能操作函数
 {
     // TODO: Add your control notification handler code here
     time_t t1,t2; //设置时间监控变量，在等待轴状态机变化时防止死循环使用
@@ -313,7 +313,7 @@ void MainWindow::on_pushButton_enable() //轴使能操作函数
     }
 }
 
-void MainWindow::on_pushButton_disable() //轴去使能操作函数
+void MainWindow::on_pushButton_disable_clicked() //轴去使能操作函数
 {
     // TODO: Add your control notification handler code here
     time_t t1,t2; //设置时间监控变量，在等待轴状态机变化时防止死循环使用
@@ -365,14 +365,14 @@ void MainWindow::on_pushButton_disable() //轴去使能操作函数
 
 
 //open io
-void MainWindow::on_pushButton_openio()
+void MainWindow::on_pushButton_openio_clicked()
 {
     WORD ioNo = ui->textEdit_PortNo->toPlainText().toShort();
     short iret = smc_write_outbit(0,ioNo,0);
     qDebug("smc_write_outbit(0,%d,0) iret=%d\n",ioNo,iret);
 }
 //close io
-void MainWindow::on_pushButton_closeio()
+void MainWindow::on_pushButton_closeio_clicked()
 {
 
     WORD ioNo = ui->textEdit_PortNo->toPlainText().toShort();
@@ -381,10 +381,8 @@ void MainWindow::on_pushButton_closeio()
 }
 
 //start
-void MainWindow::on_pushButton_start()
+void MainWindow::on_pushButton_start_clicked()
 {
-
-
     double startvel = ui->textEdit_startvel->toPlainText().toDouble();
     double runvel = ui->textEdit_runvel->toPlainText().toDouble();
     double stopvel = ui->textEdit_stopvel->toPlainText().toDouble();
@@ -436,7 +434,7 @@ void MainWindow::on_pushButton_start()
 }
 
 //decstop
-void MainWindow::on_pushButton_decstop()
+void MainWindow::on_pushButton_decstop_clicked()
 {
 
     double dectime = ui->textEdit_dectime->toPlainText().toDouble();
@@ -458,7 +456,7 @@ void MainWindow::on_pushButton_decstop()
 }
 
 //emgstop
-void MainWindow::on_pushButton_emgstop()
+void MainWindow::on_pushButton_emgstop_clicked()
 {
     short axisNo;
     short iret=0;
@@ -474,7 +472,7 @@ void MainWindow::on_pushButton_emgstop()
     }
 }
 //zero pos
-void MainWindow::on_pushButton_zeropos()
+void MainWindow::on_pushButton_zeropos_clicked()
 {
     short axisNo=0;
     short iret=0;
@@ -490,7 +488,7 @@ void MainWindow::on_pushButton_zeropos()
     }
 }
 //enc pos
-void MainWindow::on_pushButton_encpos()
+void MainWindow::on_pushButton_encpos_clicked()
 {
     short axisNo=0;
     short iret=0;
@@ -507,14 +505,14 @@ void MainWindow::on_pushButton_encpos()
 
 }
 //stop crd
-void MainWindow::on_pushButton_stopcrd()
+void MainWindow::on_pushButton_stopcrd_clicked()
 {
     short iret =0;
     iret = smc_stop_multicoor(0,0,0);
     iret = smc_stop_multicoor(0,1,0);
 }
 //change vel
-void MainWindow::on_pushButton_changevel()
+void MainWindow::on_pushButton_changevel_clicked()
 {
     WORD axisNo=0;
     short iret=0;
@@ -531,7 +529,7 @@ void MainWindow::on_pushButton_changevel()
     }
 }
 //change pos
-void MainWindow::on_pushButton_changepos()
+void MainWindow::on_pushButton_changepos_clicked()
 {
     WORD axisNo=0;
     short iret=0;
@@ -550,8 +548,7 @@ void MainWindow::on_pushButton_changepos()
 }
 
 
-
-void MainWindow::on_pushButton_line()
+void MainWindow::on_pushButton_line_clicked()
 {
 
     short iret=0;
@@ -564,4 +561,11 @@ void MainWindow::on_pushButton_line()
     }
      iret =smc_set_vector_profile_unit(0,0,0,8000,0.1,0.1,0);
      iret = smc_line_unit(0,0,4,axisList,posList,0);
+}
+
+//exit board&application
+void MainWindow::on_pushButton_exit_clicked()
+{
+    smc_board_close(0);
+    qApp->exit(0);
 }
