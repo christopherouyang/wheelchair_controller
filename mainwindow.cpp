@@ -63,6 +63,7 @@ void MainWindow::initDialog()
     ui->textEdit_pulse_2->setText("160000");
 
     ui->checkBox_axis_l->click();
+    ui->checkBox_axis_r->click();
     ui->radioButton_fl->click();
     ui->checkBox_axis_0->click();
     ui->radioButton_fw->click();
@@ -76,10 +77,10 @@ MainWindow::~MainWindow()
  void MainWindow::RefreshUI()
  {
      short iret=0;
-     double pos[4];
-     double enc[4];
-     double speed[4];
-     for (int i=0;i<4;i++)
+     double pos[2];
+     double enc[2];
+     double speed[2];
+     for (int i=0;i<2;i++)
      {
          iret = smc_get_position_unit(0,i,&pos[i]);
          iret = smc_get_encoder_unit(0,i,&enc[i]);
@@ -93,6 +94,7 @@ MainWindow::~MainWindow()
      //
      ui->textEdit_SpeedX->setText(QString::number(speed[0],'f',3));
      ui->textEdit_SpeedY->setText(QString::number(speed[1],'f',3));
+
  }
 void MainWindow::timerEvent(QTimerEvent *e)
 {
@@ -164,6 +166,7 @@ void MainWindow::timerEvent(QTimerEvent *e)
     ui->textEdit_SpeedX->setText(QString::number(speed[0],'f',3));
     ui->textEdit_SpeedY->setText(QString::number(speed[1],'f',3));
 
+    emg_stop();
 
 }
 
@@ -176,28 +179,30 @@ void MainWindow::emg_stop()
     WORD Myaxis[2] = {0,1}; //轴号
     short ret[2] = {0,0}; //错误返回
     WORD Myenable[2] = {1,1}; //急停信号使能
-    WORD Mylogic[2] = {0, 0}; //急停信号低电平有效
+    WORD Mylogic[2] = {1, 1}; //急停信号高电平有效
     /*********************函数调用执行**************************/
     //第一步、设置轴 IO 映射，将通用输入 0 作为各轴的急停信号
+    short io_0 = smc_read_inbit(MyCardNo,0); //读取IO口的电平值
+
     for(int i = 0 ; i<2; i++)
     {
         ret[i]=smc_set_axis_io_map(MyCardNo, Myaxis[i],3, 6, 0, 0);
     }
-    //第二步、设置 EMG 使能，低电平有效
+    //第二步、设置 EMG 使能，高电平有效
     for(int i = 0 ; i<2; i++)
     {
         ret[i]=smc_set_emg_mode(MyCardNo, Myaxis[i], Myenable[i],Mylogic[i]);
     }
-    //第三步、回读 EMG 使能，低电平有效
+    if (io_0==1)
+    {
+        on_pushButton_disable_clicked();
+    }
+    //第三步、回读 EMG 使能，高电平有效
     for(int i = 0 ; i<2; i++)
     {
         ret[i]=smc_get_emg_mode(MyCardNo, Myaxis[i],&Myenable[i],&Mylogic[i]);
         printf("%d 轴急停信号参数,使能,有效电平= %d %d\n ",i,Myenable[i],Mylogic[i]);
     }
-    //第四步、启动定长运动
-//    ret=smc_set_profile_unit(MyCardNo,Myaxis,0,1000,0.1,0.1,0);
-//    ret =smc_set_s_profile(MyCardNo,Myaxis,0,0.05);
-//    ret =smc_pmove_unit(MyCardNo,Myaxis,10000,1);
 }
 
 void MainWindow::on_pushButton_enable_clicked() //轴使能操作函数
