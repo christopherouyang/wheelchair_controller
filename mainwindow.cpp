@@ -48,6 +48,26 @@ void MainWindow::information_success()
     reply= QMessageBox::information(this,tr("Connection Success"),MESSAGE);
 }
 
+void::MainWindow::information_disable()
+{
+    QMessageBox::StandardButton reply;
+    QString MESSAGE = "电机未使能,请先将电机使能";
+    reply= QMessageBox::information(this,tr("Motor is disabled"),MESSAGE);
+}
+void::MainWindow::information_disable_0()
+{
+    QMessageBox::StandardButton reply;
+    QString MESSAGE = "左轮电机未使能,请先将电机使能";
+    reply= QMessageBox::information(this,tr("Motor_0 is disabled"),MESSAGE);
+}
+void::MainWindow::information_disable_1()
+{
+    QMessageBox::StandardButton reply;
+    QString MESSAGE = "右轮电机未使能,请先将电机使能";
+    reply= QMessageBox::information(this,tr("Motor_1 is disabled"),MESSAGE);
+}
+
+
 void MainWindow::initDialog()
 {
     //设定两个轮子的速度等参数的默认值
@@ -76,7 +96,7 @@ void MainWindow::initDialog()
 
     ui->checkBox_axis_l->click();
     ui->checkBox_axis_r->click(); //默认两个轮子的运动都被选中
-    ui->radioButton_fl->click();//默认定长运动
+    ui->radioButton_cs->click();//默认定长运动
     ui->checkBox_axis_0->click();
     ui->checkBox_axis_1->click();//默认两个轮椅的使能状态都被选中
     ui->radioButton_fw->click();
@@ -190,8 +210,10 @@ void MainWindow::timerEvent(QTimerEvent *e)
     ui->textEdit_linear_vel_2->setText(QString::number(linear_v,'f',3));
     ui->textEdit_angular_vel_2->setText(QString::number(angular_v,'f',3));
 
-    emg_stop(); //调用IO急停信号
-
+    if(connection==0)
+    {
+        emg_stop();//与控制器连接成功时调用IO急停信号
+    }
 }
 
 
@@ -442,6 +464,9 @@ void MainWindow::on_pushButton_start_clicked()
             runvel[i]=-0.8/coeff;
         }
     }
+    ui->textEdit_runvel->setText(QString::number(runvel[0],'f',3));
+    ui->textEdit_runvel_2->setText(QString::number(runvel[1],'f',3)); //将限制的速度显示在QT界面上
+
     double stopvel[2] = {ui->textEdit_stopvel->toPlainText().toDouble(),ui->textEdit_stopvel_2->toPlainText().toDouble()};
     double acctime[2] = {ui->textEdit_acctime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
     double dectime[2] = {ui->textEdit_dectime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
@@ -451,30 +476,58 @@ void MainWindow::on_pushButton_start_clicked()
     int direction[2];
     if (ui->radioButton_fw->isChecked())
     {
-        direction[0]=0;
+        direction[0]=1;
     }
     else
     {
-        direction[0]=1;
+        direction[0]=0;
     }
 
     if (ui->radioButton_fw_2->isChecked())
     {
-        direction[1]=0;
+        direction[1]=1;
     }
     else
     {
-        direction[1]=1;
+        direction[1]=0;
     }
 
+    for (int i=0; i<2 ; i++)
+    {
+        //如果runvel为负数,则将direction反向,runvel改为正数
+        if(runvel[i]<0)
+        {
+            direction[i]=abs(1-direction[i]);
+            runvel[i]=-runvel[i];
+        }
+    }
+
+    short statemachine[2]={1,1};
     WORD axisNo[2] ={0,1};
     short iret[2] = {0,0};
     for(int i = 0; i < 2 ; i++)
     {
         if (smc_check_done( 0, axisNo[i] ) == 0) //该轴已经在运动中
             return;
+        if (ui->checkBox_axis_l->isChecked() && ui->checkBox_axis_r->isChecked())
+        {
+            statemachine[0]=smc_read_sevon_pin(0,0);//获取0轴状态机
+            statemachine[1]=smc_read_sevon_pin(0,1);//获取1轴状态机
+            if (statemachine[1]==1 || statemachine[0]==1 )//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+            {
+                information_disable();//返回错误信号,停止该函数的运行
+                return;
+            }
+        }
+
         if(ui->checkBox_axis_l->isChecked())
         {
+            statemachine[0]=smc_read_sevon_pin(0,0);//获取0轴状态机
+            if (statemachine[0]==1)//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+            {
+                information_disable_0();//返回错误信号,停止该函数的运行
+                return;
+            }
             iret[0] = smc_set_equiv( 0, axisNo[0], 1);//设置脉冲当量
             iret[0] = smc_set_alm_mode(0,axisNo[0],0,0,0); //设置报警使能,关闭报警
             iret[0] = smc_set_pulse_outmode(0 , axisNo[0], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
@@ -491,6 +544,12 @@ void MainWindow::on_pushButton_start_clicked()
         }
         if(ui->checkBox_axis_r->isChecked())
         {
+            statemachine[1]=smc_read_sevon_pin(0,1);//获取1轴状态机
+            if (statemachine[1]==1)//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+            {
+                information_disable_1();//返回错误信号,停止该函数的运行
+                return;
+            }
             iret[1] = smc_set_equiv( 0, axisNo[1], 1);//设置脉冲当量
             iret[1] = smc_set_alm_mode(0,axisNo[1],0,0,0); //设置报警使能,关闭报警
             iret[1] = smc_set_pulse_outmode(0 , axisNo[1], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
@@ -512,39 +571,38 @@ void MainWindow::on_pushButton_start_clicked()
 void MainWindow::on_pushButton_decstop_clicked()
 {
 
-    //double dectime = ui->textEdit_dectime->toPlainText().toDouble();
-    double dectime[2] = {ui->textEdit_dectime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
-    short axisNo = 0 ;
-    short iret=0;
-    if(ui->checkBox_axis_l->isChecked())
+    double dectime[2] = {ui->textEdit_dectime->toPlainText().toDouble(),ui->textEdit_dectime_2->toPlainText().toDouble()};
+    short iret[2]={0,0};
+    double actuvel[2];
+    for (int i=0;i<2;i++)
     {
-        axisNo =0;
-        smc_set_dec_stop_time(0,axisNo,dectime[0]);//设置10ms减速停止时间
-        iret =smc_stop(0,axisNo,0);//减速停止
+       iret[i] = smc_read_current_speed_unit(0,i,&actuvel[i]);
+       double acc = fabs(actuvel[i]/dectime[i]);
+       if (acc>150000)
+       {
+           dectime[i]=fabs(actuvel[i]/150000); //如果减速的加速度>100000,修改减速时间使得加速度为100000
+       }
     }
-    if(ui->checkBox_axis_r->isChecked())
+    ui->textEdit_dectime->setText(QString::number(dectime[0],'f',3));
+    ui->textEdit_dectime_2->setText(QString::number(dectime[1],'f',3)); //将修改后的减速时间显示在QT界面上
+
+    for (int i =0;i<2;i++)
     {
-        axisNo =1;
-        smc_set_dec_stop_time(0,axisNo,dectime[1]);//设置10ms减速停止时间
-        iret =smc_stop(0,axisNo,0);//减速停止
+        smc_set_dec_stop_time(0,i,dectime[i]);//设置减速停止时间
+
+        iret[i] =smc_stop(0,i,0);//减速停止
     }
 }
 
 //emgstop
 void MainWindow::on_pushButton_emgstop_clicked()
 {
-    short axisNo;
-    short iret=0;
-    if(ui->checkBox_axis_l->isChecked())
+    short iret[2]={0,0};
+    for (int i =0;i<2;i++)
     {
-        axisNo =0;
-        iret =smc_stop(0,axisNo,0);
+        iret[i] =smc_stop(0,i,0);
     }
-    if(ui->checkBox_axis_r->isChecked())
-    {
-        axisNo =1;
-        iret =smc_stop(0,axisNo,0);
-    }
+
 }
 //zero pos
 void MainWindow::on_pushButton_zeropos_clicked()
@@ -598,22 +656,43 @@ void MainWindow::on_pushButton_changevel_clicked()
         if(runvel[i]>0.8/coeff)
         {
             runvel[i]=0.8/coeff;
+
         }
         else if(runvel[i]<(-0.8/coeff))
         {
             runvel[i]=-0.8/coeff;
         }
     }
+    ui->textEdit_runvel->setText(QString::number(runvel[0],'f',3));
+    ui->textEdit_runvel_2->setText(QString::number(runvel[1],'f',3)); //将限制的速度显示在QT界面上
+
+    //根据变速前后的速度差值决定变速的时间
+    double actuvel[2];
+    double time[2];
+    for (int i=0;i<2;i++)
+    {
+       iret = smc_read_current_speed_unit(0,i,&actuvel[i]);
+       double diff = fabs(runvel[i]-actuvel[i]);
+       if (diff<60000)
+       {
+           time[i]=0; //如果差值diff<60000,则时间为0
+       }
+       else
+       {
+           time[i]=diff/600000; //反之,则时间为diff/600000
+       }
+    }
+
 
     if(ui->checkBox_axis_l->isChecked())
     {
         axisNo =0;
-        iret =smc_change_speed_unit(0,axisNo,runvel[0],0);
+        iret =smc_change_speed_unit(0,axisNo,runvel[0],time[0]);
     }
     if(ui->checkBox_axis_r->isChecked())
     {
         axisNo =1;
-        iret =smc_change_speed_unit(0,axisNo,runvel[1],0);
+        iret =smc_change_speed_unit(0,axisNo,runvel[1],time[1]);
     }
 }
 //change pos
@@ -622,6 +701,8 @@ void MainWindow::on_pushButton_changepos_clicked()
     WORD axisNo=0;
     short iret=0;
     double destpos[2] = {ui->textEdit_destpos->toPlainText().toDouble(),ui->textEdit_destpos_2->toPlainText().toDouble()};
+
+
     if(ui->checkBox_axis_l->isChecked())
     {
         axisNo =0;
@@ -714,16 +795,38 @@ void MainWindow::on_pushButton_start_wc_clicked()
     }
 
     double stopvel[2] = {ui->textEdit_stopvel->toPlainText().toDouble(),ui->textEdit_stopvel_2->toPlainText().toDouble()};
-    double acctime[2] = {v_wheels(1,0)/100000 ,v_wheels(0,0)/100000};
-    double dectime[2] = {v_wheels(1,0)/100000 ,v_wheels(0,0)/100000};
+    double acctime[2] = {v_wheels(1,0)/150000 ,v_wheels(0,0)/150000};
+    double dectime[2] = {v_wheels(1,0)/150000 ,v_wheels(0,0)/150000};
     double stime[2] = {ui->textEdit_stime->toPlainText().toDouble(),ui->textEdit_stime_2->toPlainText().toDouble()};
+
+    int direction[2]={0,0};
+
+
+    for (int i=0; i<2 ; i++)
+    {
+        //如果runvel为负数,则将direction反向,runvel改为正数
+        if(runvel[i]<0)
+        {
+            direction[i]=abs(1-direction[i]);
+            runvel[i]=-runvel[i];
+        }
+    }
 
     WORD axisNo[2] ={0,1};
     short iret[2] = {0,0};
+    short statemachine[2]={1,1};
     for(int i = 0; i < 2 ; i++)
     {
         if (smc_check_done( 0, axisNo[i] ) == 0) //该轴已经在运动中
             return;
+        statemachine[0]=smc_read_sevon_pin(0,0);//获取0轴状态机
+        statemachine[1]=smc_read_sevon_pin(0,1);//获取1轴状态机
+        if (statemachine[1]==1 || statemachine[0]==1 )//监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+        {
+            information_disable();//返回错误信号,停止该函数的运行
+            return;
+        }
+
         //左轮运动
         iret[0] = smc_set_equiv( 0, axisNo[0], 1);//设置脉冲当量
         iret[0] = smc_set_alm_mode(0,axisNo[0],0,0,0); //设置报警使能,关闭报警
@@ -731,7 +834,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
         iret[0] = smc_set_profile_unit(0,axisNo[0],startvel[0],runvel[0],acctime[0],dectime[0],stopvel[0]);//设定单轴运动速度参数
         iret[0] = smc_set_s_profile(0,axisNo[0],0,stime[0]);
 
-        iret[0] = smc_vmove(0,axisNo[0],0); //恒速运动
+        iret[0] = smc_vmove(0,axisNo[0],direction[0]); //恒速运动
         //右轮运动
         iret[1] = smc_set_equiv( 0, axisNo[1], 1);//设置脉冲当量
         iret[1] = smc_set_alm_mode(0,axisNo[1],0,0,0); //设置报警使能,关闭报警
@@ -739,13 +842,13 @@ void MainWindow::on_pushButton_start_wc_clicked()
         iret[1] = smc_set_profile_unit(0,axisNo[1],startvel[1],runvel[1],acctime[1],dectime[1],stopvel[1]);//设定单轴运动速度参数
         iret[1] = smc_set_s_profile(0,axisNo[1],0,stime[1]);
 
-        iret[i] = smc_vmove(0,axisNo[1],0); //恒速运动
+        iret[i] = smc_vmove(0,axisNo[1],direction[1]); //恒速运动
 
     }
 
 }
 
-void MainWindow::on_pushButton_changvel_wc_clicked()
+void MainWindow::on_pushButton_changevel_wc_clicked()
 {
     //定义反速度关系矩阵
     MatrixXd trans_2(2,2);
@@ -766,7 +869,7 @@ void MainWindow::on_pushButton_changvel_wc_clicked()
     v_wheels = trans * v_chairs; //由轮椅速度反解出电机速度
 
     short iret[2]={0,0};
-    double runvel[2] = {v_wheels(1,0),v_wheels(0,0)};
+    double runvel[2] = {-v_wheels(1,0),-v_wheels(0,0)};
     //限制每个轮子的最大线速度为0.8m/s
     for (int i=0;i<2;i++)
     {
@@ -779,10 +882,26 @@ void MainWindow::on_pushButton_changvel_wc_clicked()
             runvel[i]=-0.8/coeff;
         }
     }
+     //根据变速前后的速度差值决定变速的时间
+    double actuvel[2];
+    double time[2];
+    for (int i=0;i<2;i++)
+    {
+        iret[i] = smc_read_current_speed_unit(0,i,&actuvel[i]);
+        double diff = fabs(runvel[i]-actuvel[i]);
+        if (diff<60000)
+        {
+            time[i]=0;
+        }
+        else
+        {
+            time[i]=diff/600000;
+        }
+    }
 
     for(int i=0; i<2 ; i++)
     {
-        iret[i] =smc_change_speed_unit(0,i,runvel[i],0);
+        iret[i] =smc_change_speed_unit(0,i,runvel[i],time[i]);
     }
 
 

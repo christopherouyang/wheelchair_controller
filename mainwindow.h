@@ -51,7 +51,8 @@ private slots:
 
     void on_pushButton_start_wc_clicked();
 
-    void on_pushButton_changvel_wc_clicked();
+
+    void on_pushButton_changevel_wc_clicked();
 
 private:
 
@@ -60,6 +61,10 @@ private:
     void initDialog();
     void information_fail();
     void information_success();
+    void information_disable();
+    void information_disable_0();
+    void information_disable_1();
+
     void emg_stop();
 
 public:
