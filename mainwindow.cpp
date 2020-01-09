@@ -131,8 +131,8 @@ void MainWindow::timerEvent(QTimerEvent *e)
         iret = smc_get_axis_run_mode(0,i,&runmode[i]);
     }
     //由每个轮子的速度获取轮椅速度
-    linear_v=(speed[0]+speed[1])*coeff/2;
-    angular_v=(speed[1]-speed[0])*coeff/space;
+    linear_v=-(speed[0]+speed[1])*coeff/2;
+    angular_v=-(speed[1]-speed[0])*coeff/space;
 
     if (status[0]==1)
     {
@@ -189,7 +189,8 @@ void MainWindow::timerEvent(QTimerEvent *e)
     //
     ui->textEdit_linear_vel_2->setText(QString::number(linear_v,'f',3));
     ui->textEdit_angular_vel_2->setText(QString::number(angular_v,'f',3));
-    //emg_stop(); //调用IO急停信号
+
+    emg_stop(); //调用IO急停信号
 
 }
 
@@ -224,7 +225,7 @@ void MainWindow::emg_stop()
     for(int i = 0 ; i<2; i++)
     {
         ret[i]=smc_get_emg_mode(MyCardNo, Myaxis[i],&Myenable[i],&Mylogic[i]);
-        printf("%d 轴急停信号参数,使能,有效电平= %d %d\n ",i,Myenable[i],Mylogic[i]);
+        //printf("%d 轴急停信号参数,使能,有效电平= %d %d\n ",i,Myenable[i],Mylogic[i]);
     }
 }
 
