@@ -64,7 +64,7 @@ void MainWindow::initDialog()
 
     ui->checkBox_axis_l->click();
     ui->checkBox_axis_r->click();
-    ui->radioButton_fl->click();
+    ui->radioButton_cs->click();
     ui->checkBox_axis_0->click();
     ui->radioButton_fw->click();
     ui->radioButton_fw_2->click();
@@ -166,7 +166,10 @@ void MainWindow::timerEvent(QTimerEvent *e)
     ui->textEdit_SpeedX->setText(QString::number(speed[0],'f',3));
     ui->textEdit_SpeedY->setText(QString::number(speed[1],'f',3));
 
-    emg_stop();
+    if(connection==1)
+    {
+        emg_stop();
+    }
 
 }
 
@@ -430,6 +433,15 @@ void MainWindow::on_pushButton_start_clicked()
     {
         direction[1]=0;
     }
+    for (int i=0; i<2 ; i++)
+    {
+        if(runvel[i]<0)
+        {
+            direction[i]=abs(1-direction[i]);
+            runvel[i]=-runvel[i];
+        }
+    }
+
 
     WORD axisNo[2] ={0,1};
     short iret[2] = {0,0};
@@ -556,15 +568,34 @@ void MainWindow::on_pushButton_changevel_clicked()
     WORD axisNo=0;
     short iret=0;
     double runvel[2] = {ui->textEdit_runvel->toPlainText().toDouble(),ui->textEdit_runvel_2->toPlainText().toDouble()};
+    double actuvel[2];
+    double time[2];
+    for (int i=0;i<2;i++)
+    {
+        iret = smc_read_current_speed_unit(0,i,&actuvel[i]);
+        double diff = fabs(runvel[i]-actuvel[i]);
+        if (diff<60000)
+        {
+            time[i]=0;
+        }
+        else
+        {
+            time[i]=diff/600000;
+        }
+    }
+
+
+
+
     if(ui->checkBox_axis_l->isChecked())
     {
         axisNo =0;
-        iret =smc_change_speed_unit(0,axisNo,runvel[0],0);
+        iret =smc_change_speed_unit(0,axisNo,runvel[0],time[0]);
     }
     if(ui->checkBox_axis_r->isChecked())
     {
         axisNo =1;
-        iret =smc_change_speed_unit(0,axisNo,runvel[1],0);
+        iret =smc_change_speed_unit(0,axisNo,runvel[1],time[1]);
     }
 }
 //change pos
