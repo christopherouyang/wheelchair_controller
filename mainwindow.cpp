@@ -66,6 +66,13 @@ void::MainWindow::information_disable_1()
     QString MESSAGE = "右轮电机未使能,请先将电机使能";
     reply= QMessageBox::information(this,tr("Motor_1 is disabled"),MESSAGE);
 }
+void::MainWindow::information_emgstop_on()
+{
+    QMessageBox::StandardButton reply;
+    QString MESSAGE = "急停开关被按下,请先释放急停开关再使能";
+    reply= QMessageBox::information(this,tr("EMG stop is on"),MESSAGE);
+}
+
 
 
 void MainWindow::initDialog()
@@ -263,6 +270,13 @@ void MainWindow::on_pushButton_enable_clicked() //轴使能操作函数
 
     if(errcode==0) //总线正常才允许使能操作
     {
+        short io_0 = smc_read_inbit(0,0);
+        if (io_0==1)
+        {
+            on_pushButton_disable_clicked();
+            information_emgstop_on();
+            return;
+        }
         if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked())
         {
             for(int i=0; i<2; i++)
@@ -673,13 +687,13 @@ void MainWindow::on_pushButton_changevel_clicked()
     {
        iret = smc_read_current_speed_unit(0,i,&actuvel[i]);
        double diff = fabs(runvel[i]-actuvel[i]);
-       if (diff<60000)
+       if (diff<10000)
        {
            time[i]=0; //如果差值diff<60000,则时间为0
        }
        else
        {
-           time[i]=diff/600000; //反之,则时间为diff/600000
+           time[i]=diff/100000; //反之,则时间为diff/100000
        }
     }
 
@@ -889,13 +903,13 @@ void MainWindow::on_pushButton_changevel_wc_clicked()
     {
         iret[i] = smc_read_current_speed_unit(0,i,&actuvel[i]);
         double diff = fabs(runvel[i]-actuvel[i]);
-        if (diff<60000)
+        if (diff<20000)
         {
             time[i]=0;
         }
         else
         {
-            time[i]=diff/600000;
+            time[i]=diff/100000;
         }
     }
 

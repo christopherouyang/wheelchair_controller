@@ -64,6 +64,7 @@ private:
     void information_disable();
     void information_disable_0();
     void information_disable_1();
+    void information_emgstop_on();
 
     void emg_stop();
 
