@@ -59,12 +59,13 @@ private:
     Ui::MainWindow *ui;
     void timerEvent(QTimerEvent *e);
     void initDialog();
-    void information_fail();
-    void information_success();
+    void information_connection_fail();
+    void information_connection_success();
     void information_disable();
     void information_disable_0();
     void information_disable_1();
     void information_emgstop_on();
+    void information_connection_interrupted();
 
     void emg_stop();
 

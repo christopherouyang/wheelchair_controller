@@ -24,24 +24,24 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         qDebug("smc_board_init iret = %d\n",connection);
         qDebug("连接失败！请检查控制卡的连接");
-        information_fail();
+        information_connection_fail();
     }
     else
     {
         qDebug("控制卡连接成功！");
-        information_success();
+        information_connection_success();
     }
     startTimer(200); //定义类QTimerEvent的刷新时间(ms)
 }
 
-void MainWindow::information_fail()
+void MainWindow::information_connection_fail()
 {
     QMessageBox::StandardButton reply;
     QString MESSAGE = "连接失败！请检查控制卡的连接";
     reply= QMessageBox::information(this,tr("Connection Fails"),MESSAGE);
 }
 
-void MainWindow::information_success()
+void MainWindow::information_connection_success()
 {
     QMessageBox::StandardButton reply;
     QString MESSAGE = "控制卡连接成功";
@@ -71,6 +71,12 @@ void::MainWindow::information_emgstop_on()
     QMessageBox::StandardButton reply;
     QString MESSAGE = "急停开关被按下,请先释放急停开关再使能";
     reply= QMessageBox::information(this,tr("EMG stop is on"),MESSAGE);
+}
+void MainWindow::information_connection_interrupted()
+{
+    QMessageBox::StandardButton reply;
+    QString MESSAGE = "连接中断！请检查控制卡的连接";
+    reply= QMessageBox::information(this,tr("Connection is interrupted"),MESSAGE);
 }
 
 
@@ -141,7 +147,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::timerEvent(QTimerEvent *e)
 {
-    short iret=0;
+    short iret[2]={0,0};
     double pos[2]={0.0,0.0};
     double enc[2]={0.0,0.0};
     double speed[2]={0.0,0.0};
@@ -151,11 +157,11 @@ void MainWindow::timerEvent(QTimerEvent *e)
     WORD runmode[2]={0,0};
     for (int i=0;i<2;i++)
     {
-        iret = smc_get_position_unit(0,i,&pos[i]);
-        iret = smc_get_encoder_unit(0,i,&enc[i]);
-        iret = smc_read_current_speed_unit(0,i,&speed[i]);
+        iret[i] = smc_get_position_unit(0,i,&pos[i]);
+        iret[i] = smc_get_encoder_unit(0,i,&enc[i]);
+        iret[i] = smc_read_current_speed_unit(0,i,&speed[i]);
         status[i] = smc_check_done(0, i );
-        iret = smc_get_axis_run_mode(0,i,&runmode[i]);
+        iret[i] = smc_get_axis_run_mode(0,i,&runmode[i]);
     }
     //由每个轮子的速度获取轮椅速度
     linear_v=-(speed[0]+speed[1])*coeff/2;
@@ -217,10 +223,31 @@ void MainWindow::timerEvent(QTimerEvent *e)
     ui->textEdit_linear_vel_2->setText(QString::number(linear_v,'f',3));
     ui->textEdit_angular_vel_2->setText(QString::number(angular_v,'f',3));
 
+    short timeout;
+    short status_connect;
+    timeout = smc_set_connect_timeout(0);
+    status_connect = smc_get_connect_status(0);//读取实时的连接状态
+
+
     if(connection==0)
     {
         emg_stop();//与控制器连接成功时调用IO急停信号
+        if(status_connect!=1)//如果连接失败,则立刻急停
+        {
+            for (int i =0;i<2;i++)
+            {
+                iret[i] =smc_stop(0,i,0);
+            }
+            on_pushButton_disable_clicked();
+            information_connection_interrupted();
+        }
     }
+
+
+    //printf("连接延时%d ms,连接状态%d\n",timeout,status_connect);
+
+
+
 }
 
 
@@ -592,9 +619,9 @@ void MainWindow::on_pushButton_decstop_clicked()
     {
        iret[i] = smc_read_current_speed_unit(0,i,&actuvel[i]);
        double acc = fabs(actuvel[i]/dectime[i]);
-       if (acc>150000)
+       if (acc>20000)
        {
-           dectime[i]=fabs(actuvel[i]/150000); //如果减速的加速度>100000,修改减速时间使得加速度为100000
+           dectime[i]=fabs(actuvel[i]/100000); //如果减速的加速度>100000,修改减速时间使得加速度为100000
        }
     }
     ui->textEdit_dectime->setText(QString::number(dectime[0],'f',3));
@@ -689,7 +716,7 @@ void MainWindow::on_pushButton_changevel_clicked()
        double diff = fabs(runvel[i]-actuvel[i]);
        if (diff<10000)
        {
-           time[i]=0; //如果差值diff<60000,则时间为0
+           time[i]=0; //如果差值diff<10000,则时间为0
        }
        else
        {
