@@ -509,8 +509,10 @@ void MainWindow::on_pushButton_start_clicked()
     ui->textEdit_runvel_2->setText(QString::number(runvel[1],'f',3)); //将限制的速度显示在QT界面上
 
     double stopvel[2] = {ui->textEdit_stopvel->toPlainText().toDouble(),ui->textEdit_stopvel_2->toPlainText().toDouble()};
-    double acctime[2] = {ui->textEdit_acctime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
-    double dectime[2] = {ui->textEdit_dectime->toPlainText().toDouble(),ui->textEdit_acctime_2->toPlainText().toDouble()};
+
+    double acctime[2] = {runvel[0]/150000 ,runvel[1]/150000};
+    double dectime[2] = {runvel[0]/150000 ,runvel[1]/150000};
+
     double stime[2] = {ui->textEdit_stime->toPlainText().toDouble(),ui->textEdit_stime_2->toPlainText().toDouble()};
     //double destpos = ui->textEdit_destpos->toPlainText().toDouble();
     double pulse[2] = {ui->textEdit_pulse->toPlainText().toDouble(),ui->textEdit_pulse_2->toPlainText().toDouble()};
