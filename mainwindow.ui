@@ -159,7 +159,7 @@
     <widget class="QTextEdit" name="textEdit_destpos">
      <property name="geometry">
       <rect>
-       <x>470</x>
+       <x>480</x>
        <y>40</y>
        <width>71</width>
        <height>31</height>
@@ -172,7 +172,7 @@
     <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>420</x>
        <y>50</y>
        <width>61</width>
        <height>19</height>
@@ -211,7 +211,7 @@
     <widget class="QLabel" name="label_20">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>420</x>
        <y>90</y>
        <width>41</width>
        <height>19</height>
@@ -224,7 +224,7 @@
     <widget class="QTextEdit" name="textEdit_pulse">
      <property name="geometry">
       <rect>
-       <x>470</x>
+       <x>480</x>
        <y>80</y>
        <width>71</width>
        <height>31</height>
@@ -237,7 +237,7 @@
     <widget class="QLabel" name="label_21">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>420</x>
        <y>130</y>
        <width>61</width>
        <height>19</height>
@@ -328,7 +328,7 @@
     <widget class="QTextEdit" name="textEdit_pulse_2">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>560</x>
        <y>80</y>
        <width>71</width>
        <height>31</height>
@@ -341,7 +341,7 @@
     <widget class="QTextEdit" name="textEdit_destpos_2">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>560</x>
        <y>40</y>
        <width>71</width>
        <height>31</height>
@@ -354,7 +354,7 @@
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>560</x>
        <y>119</y>
        <width>81</width>
        <height>51</height>
@@ -368,7 +368,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>91</width>
+        <width>71</width>
         <height>23</height>
        </rect>
       </property>
@@ -403,7 +403,7 @@
     <widget class="QGroupBox" name="groupBox_6">
      <property name="geometry">
       <rect>
-       <x>470</x>
+       <x>480</x>
        <y>119</y>
        <width>81</width>
        <height>51</height>
@@ -417,14 +417,14 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>81</width>
+        <width>71</width>
         <height>23</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <pointsize>10</pointsize>
-        <italic>true</italic>
+        <italic>false</italic>
        </font>
       </property>
       <property name="text">
@@ -1202,10 +1202,10 @@
     <widget class="QSlider" name="slider_linear_vel">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>10</x>
        <y>90</y>
-       <width>181</width>
-       <height>16</height>
+       <width>321</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="minimum">
@@ -1213,6 +1213,9 @@
      </property>
      <property name="maximum">
       <number>80</number>
+     </property>
+     <property name="singleStep">
+      <number>5</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1224,10 +1227,10 @@
     <widget class="QSlider" name="slider_angular_vel">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>10</x>
        <y>180</y>
-       <width>181</width>
-       <height>16</height>
+       <width>321</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="minimum">
@@ -1237,7 +1240,7 @@
       <number>300</number>
      </property>
      <property name="singleStep">
-      <number>30</number>
+      <number>10</number>
      </property>
      <property name="pageStep">
       <number>4</number>
@@ -1265,7 +1268,7 @@
     <widget class="QLabel" name="label_18">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>10</x>
        <y>110</y>
        <width>31</width>
        <height>19</height>
@@ -1278,7 +1281,7 @@
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>10</x>
        <y>200</y>
        <width>31</width>
        <height>20</height>
@@ -1294,7 +1297,7 @@
     <widget class="QLabel" name="label_23">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>160</x>
        <y>200</y>
        <width>21</width>
        <height>19</height>
@@ -1310,7 +1313,7 @@
     <widget class="QLabel" name="label_24">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>160</x>
        <y>110</y>
        <width>21</width>
        <height>19</height>
@@ -1339,7 +1342,7 @@
     <widget class="QTextEdit" name="textEdit_goal_x">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>200</x>
        <y>290</y>
        <width>61</width>
        <height>31</height>
@@ -1352,7 +1355,7 @@
     <widget class="QTextEdit" name="textEdit_goal_y">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>120</x>
        <y>290</y>
        <width>61</width>
        <height>31</height>
