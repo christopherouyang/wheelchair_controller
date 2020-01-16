@@ -112,7 +112,7 @@ void MainWindow::initDialog()
 
     ui->textEdit_goal_x->setText("0");
     ui->textEdit_goal_y->setText("0.2");
-    ui->textEdit_goal_theta->setText("0");
+    ui->textEdit_goal_theta->setText("0"); //定义默认移动方式：前进0.2m
     ui->textEdit_goal_dv->setText("0");
     ui->textEdit_goal_dtheta->setText("0");
 
