@@ -28,8 +28,10 @@ private slots:
     void on_pushButton_start_clicked();
 
     void on_pushButton_decstop_clicked();
+    void on_pushButton_decstop_2_clicked();
 
     void on_pushButton_emgstop_clicked();
+    void on_pushButton_emgstop_2_clicked();
 
     void on_pushButton_zeropos_clicked();
 
@@ -48,18 +50,27 @@ private slots:
     void on_pushButton_enable_clicked();
 
     void on_pushButton_exit_clicked();
+    void on_pushButton_exit_2_clicked();
 
     void on_pushButton_start_wc_clicked();
 
-    void on_pushButton_changvel_wc_clicked();
+    void on_pushButton_changevel_wc_clicked();
+
+    void on_pushButton_changepos_wc_clicked();
 
 private:
 
     Ui::MainWindow *ui;
     void timerEvent(QTimerEvent *e);
     void initDialog();
-    void information_fail();
-    void information_success();
+    void information_connection_fail();
+    void information_connection_success();
+    void information_disable();
+    void information_disable_0();
+    void information_disable_1();
+    void information_emgstop_on();
+    void information_connection_interrupted();
+
     void emg_stop();
 
 public:
