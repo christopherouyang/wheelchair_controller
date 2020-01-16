@@ -105,7 +105,9 @@ void MainWindow::initDialog()
     ui->textEdit_pulse_2->setText("320000");
 
     ui->textEdit_linear_vel->setText("0.1");
+    ui->slider_linear_vel->setValue(10);
     ui->textEdit_angular_vel->setText("0");
+    ui->slider_angular_vel->setValue(0);
 
     ui->checkBox_axis_l->click();
     ui->checkBox_axis_r->click(); //默认两个轮子的运动都被选中
@@ -246,7 +248,8 @@ void MainWindow::timerEvent(QTimerEvent *e)
 
     //printf("连接延时%d ms,连接状态%d\n",timeout,status_connect);
 
-
+    //connect(ui->slider_linear_vel,SIGNAL(valueChanged(int)),ui->textEdit_linear_vel,SLOT(setText(QString::number(int,'f',3))));
+    //ui->slider_linear_vel->sliderReleased();
 
 }
 
@@ -820,6 +823,9 @@ void MainWindow::on_pushButton_start_wc_clicked()
     v_chairs(0,0)=ui->textEdit_linear_vel->toPlainText().toDouble();
     v_chairs(1,0)=ui->textEdit_angular_vel->toPlainText().toDouble();
 
+    v_chairs(0,0)=double(ui->slider_linear_vel->value())/100;
+    v_chairs(1,0)=double(ui->slider_angular_vel->value())/10;
+
     v_wheels = trans * v_chairs; //由轮椅速度反解出电机速度
 
     double startvel[2] = {ui->textEdit_startvel->toPlainText().toDouble(),ui->textEdit_startvel_2->toPlainText().toDouble()};
@@ -908,6 +914,9 @@ void MainWindow::on_pushButton_changevel_wc_clicked()
     MatrixXd v_chairs(2,1);
     v_chairs(0,0)=ui->textEdit_linear_vel->toPlainText().toDouble();
     v_chairs(1,0)=ui->textEdit_angular_vel->toPlainText().toDouble();
+    v_chairs(0,0)=double(ui->slider_linear_vel->value())/100;
+    v_chairs(1,0)=double(ui->slider_angular_vel->value())/10;
+
 
     v_wheels = trans * v_chairs; //由轮椅速度反解出电机速度
 
@@ -946,6 +955,6 @@ void MainWindow::on_pushButton_changevel_wc_clicked()
     {
         iret[i] =smc_change_speed_unit(0,i,runvel[i],time[i]);
     }
-
-
 }
+
+
