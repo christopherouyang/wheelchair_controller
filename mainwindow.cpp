@@ -85,7 +85,18 @@ void MainWindow::information_connection_interrupted()
 
 void MainWindow::initDialog()
 {
-    //设定两个轮子的速度等参数的默认值
+    ui->textEdit_PortNo->setText("0");//默认port_no为0
+
+    ui->checkBox_axis_0->click();
+    ui->checkBox_axis_1->click();//默认两个轮椅的使能状态都被选中
+
+    //设定两个轮子单独运动时，电机速度等参数的默认值
+    ui->checkBox_axis_l->click();
+    ui->checkBox_axis_r->click(); //默认两个轮子的运动都被选中
+    ui->radioButton_fw->click();
+    ui->radioButton_fw_2->click();//默认两个轮子的方向均为前进
+
+    ui->radioButton_cs->click();
 
     ui->textEdit_startvel->setText("100");
     ui->textEdit_runvel->setText("32000");
@@ -94,8 +105,7 @@ void MainWindow::initDialog()
     ui->textEdit_dectime->setText("0.1");
     ui->textEdit_stime->setText("0.05");
     ui->textEdit_destpos->setText("20000");
-    ui->textEdit_pulse->setText("320000");
-    ui->textEdit_PortNo->setText("0");
+    ui->textEdit_pulse->setText("320000"); //左轮
 
     ui->textEdit_startvel_2->setText("100");
     ui->textEdit_runvel_2->setText("32000");
@@ -104,27 +114,23 @@ void MainWindow::initDialog()
     ui->textEdit_dectime_2->setText("0.1");
     ui->textEdit_stime_2->setText("0.05");
     ui->textEdit_destpos_2->setText("20000");
-    ui->textEdit_pulse_2->setText("320000");
+    ui->textEdit_pulse_2->setText("320000");//右轮
 
-    ui->textEdit_linear_vel->setText("0.1");
+
+    ui->radioButton_cs_2->click();//默认轮椅运动为匀速运动
+    //设定轮椅匀速运动默认参数
+    ui->textEdit_linear_vel->setText("0.1"); //默认移动的线速度为0.1m/s
     ui->slider_linear_vel->setValue(10);
-    ui->textEdit_angular_vel->setText("0");
+    ui->textEdit_angular_vel->setText("0");//默认移动的角速度为0
     ui->slider_angular_vel->setValue(0);
 
-    ui->textEdit_goal_x->setText("0");
-    ui->textEdit_goal_y->setText("0.2");
-    ui->textEdit_goal_theta->setText("0"); //定义默认移动方式：前进0.2m
-    ui->textEdit_goal_dv->setText("0.1");
-    ui->textEdit_goal_dtheta->setText("0");
+    //轮椅定长运动参数
+    ui->textEdit_goal_x->setText("0.2");
+    ui->textEdit_goal_y->setText("0");
+    ui->textEdit_goal_theta->setText("0"); //默认移动方式：前进0.2m
+    ui->textEdit_goal_dv->setText("0.15");//默认直线运动速度为0.2m/s
+    ui->textEdit_goal_dtheta->setText("15"); //默认角速度为15°/s
 
-    ui->checkBox_axis_l->click();
-    ui->checkBox_axis_r->click(); //默认两个轮子的运动都被选中
-    ui->radioButton_cs->click();
-    ui->radioButton_cs_2->click();//默认匀速运动
-    ui->checkBox_axis_0->click();
-    ui->checkBox_axis_1->click();//默认两个轮椅的使能状态都被选中
-    ui->radioButton_fw->click();
-    ui->radioButton_fw_2->click();//默认两个轮子的方向均为前进
 }
 
 MainWindow::~MainWindow()
@@ -174,7 +180,7 @@ void MainWindow::timerEvent(QTimerEvent *e)
         status[i] = smc_check_done(0, i );
         iret[i] = smc_get_axis_run_mode(0,i,&runmode[i]);
     }
-    //由每个轮子的速度获取轮椅速度
+    //由每个轮子的速度获取轮椅速度，负号是因为电机正方向对应的是轮椅的后退反向
     linear_v=-(speed[0]+speed[1])*coeff/2;
     angular_v=-(speed[1]-speed[0])*coeff/space*180/pi;
 
@@ -858,20 +864,26 @@ void MainWindow::on_pushButton_start_wc_clicked()
     v_wheels = trans * v_chairs; //由轮椅速度反解出电机速度
 
     double startvel[2] = {ui->textEdit_startvel->toPlainText().toDouble(),ui->textEdit_startvel_2->toPlainText().toDouble()};
-    double runvel[2] = {v_wheels(1,0),v_wheels(0,0)};
+    double runvel[3][2] = {
+        {0,0},
+        {v_wheels(1,0),v_wheels(0,0)},
+        {0,0},
+    };
     //限制每个轮子的最大线速度为0.8m/s
-    for (int i=0;i<2;i++)
+    for(int j=0; j<3; j++)
     {
-        if(runvel[i]>0.8/coeff)
+        for (int i=0;i<2;i++)
         {
-            runvel[i]=0.8/coeff;
-        }
-        else if(runvel[i]<(-0.8/coeff))
-        {
-            runvel[i]=-0.8/coeff;
+            if(runvel[j][i]>0.8/coeff)
+            {
+                runvel[j][i]=0.8/coeff;
+            }
+            else if(runvel[j][i]<(-0.8/coeff))
+            {
+                runvel[j][i]=-0.8/coeff;
+            }
         }
     }
-
     double stopvel[2] =
     //{
         //{runvel[0],runvel[1]},
@@ -886,16 +898,16 @@ void MainWindow::on_pushButton_start_wc_clicked()
     double dectime[2] = {v_wheels(1,0)/150000 ,v_wheels(0,0)/150000};
     double stime[2] = {ui->textEdit_stime->toPlainText().toDouble(),ui->textEdit_stime_2->toPlainText().toDouble()};
 
-    int direction[2]={0,0};
+    int direction[2]={0,0};//因为电机正方向对应的是轮椅的后退反向，所以电机方向默认为负
 
 
     for (int i=0; i<2 ; i++)
     {
-        //如果runvel为负数,则将direction反向,runvel改为正数
-        if(runvel[i]<0)
+        //如果runvel[1]为负数,则将direction反向,runvel[1]改为正数
+        if(runvel[1][i]<0)
         {
             direction[i]=abs(1-direction[i]);
-            runvel[i]=-runvel[i];
+            runvel[1][i]=-runvel[1][i];
         }
     }
 
@@ -918,7 +930,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
         iret[i] = smc_set_equiv( 0, axisNo[i], 1);//设置脉冲当量
         iret[i] = smc_set_alm_mode(0,axisNo[i],0,0,0); //设置报警使能,关闭报警
         iret[i] = smc_set_pulse_outmode(0 , axisNo[i], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-        iret[i] = smc_set_profile_unit(0,axisNo[i],startvel[i],runvel[i],acctime[i],dectime[i],stopvel[i]);//设定单轴运动速度参数
+        iret[i] = smc_set_profile_unit(0,axisNo[i],startvel[i],runvel[1][i],acctime[i],dectime[i],stopvel[i]);//设定单轴运动速度参数
         iret[i] = smc_set_s_profile(0,axisNo[i],0,stime[i]);
 
 //        //左轮运动参数
@@ -941,12 +953,12 @@ void MainWindow::on_pushButton_start_wc_clicked()
         iret[0] = smc_vmove(0,axisNo[0],direction[0]); //恒速运动
         iret[1] = smc_vmove(0,axisNo[1],direction[1]); //恒速运动
     }
-    else if(ui->radioButton_fl_2->isChecked())
+    else if(ui->radioButton_fl_2->isChecked()) //开始定长运动
     {
         //定义轮椅和电机的终点速度
         MatrixXd v_chairs_end(2,1);
         v_chairs_end(0,0)=ui->textEdit_goal_dv->toPlainText().toDouble();
-        v_chairs_end(1,0)=ui->textEdit_goal_dtheta->toPlainText().toDouble();
+        v_chairs_end(1,0)=ui->textEdit_goal_dtheta->toPlainText().toDouble()*pi/180;
         MatrixXd v_wheels_end(2,1);
         v_wheels_end = trans * v_chairs_end; //由轮椅终点速度反解出电机终点速度
         //stopvel[2][0] = v_wheels_end(0,0);
@@ -954,30 +966,38 @@ void MainWindow::on_pushButton_start_wc_clicked()
         //stopvel[2][0]=100;
         //stopvel[2][1]=100;
 
-        //定义轮椅和电机的运动速度
-        runvel[0] = ui->textEdit_goal_dv->toPlainText().toDouble()/coeff;
-        runvel[1] = ui->textEdit_goal_dv->toPlainText().toDouble()/coeff;
+        //定义电机在轮椅直线运动时的速度大小
+        runvel[1][0] = fabs(ui->textEdit_goal_dv->toPlainText().toDouble()/coeff);
+        runvel[1][1] = fabs(ui->textEdit_goal_dv->toPlainText().toDouble()/coeff);
+        //定义电机在轮椅旋转时的速度大小
+        for(int j=0;j<3;j=j+2)
+        {
+            for (int i=0; i<2 ; i++)
+            {
+                runvel[j][i]= fabs(ui->textEdit_goal_dtheta->toPlainText().toDouble()*pi/180 *space / coeff /2) ;
+            }
+        }
 
-        //定义轮椅和电机的终点位置和角度
+        //定义轮椅的终点位置和角度，其中轮椅前进方向为x轴正方向，轮椅左侧垂直于x轴为y轴正方向，逆时针为theta正方向
         double goal_x=ui->textEdit_goal_x->toPlainText().toDouble();
         double goal_y=ui->textEdit_goal_y->toPlainText().toDouble();
         double goal_theta=ui->textEdit_goal_theta->toPlainText().toDouble()*pi/180;
         double delta_theta;
-        if (goal_x==0)
-        {
-            if(goal_y>=0)
-            {
-                delta_theta = pi/2;
-            }
-            else
-            {
-                delta_theta = -pi/2;
-            }
-        }
-        else
-        {
-            delta_theta=atan(goal_y/goal_x); //计算轮椅终点和起点连线与轮椅当前位置的角度
-        }
+//        if (goal_x==0)
+//        {
+//            if(goal_y>=0)
+//            {
+//                delta_theta = pi/2;
+//            }
+//            else
+//            {
+//                delta_theta = -pi/2;
+//            }
+//        }
+//        else
+//        {
+            delta_theta=atan2(goal_y,goal_x); //计算轮椅终点和起点连线与轮椅当前位置的角度,取值范围(-pi/2,pi/2]
+        //}
         double dist=sqrt(pow(goal_x,2)+pow(goal_y,2));
         double pulse[3][2];
 
@@ -1015,11 +1035,10 @@ void MainWindow::on_pushButton_start_wc_clicked()
                 iret[i] = smc_set_equiv( 0, axisNo[i], 1);//设置脉冲当量
                 iret[i] = smc_set_alm_mode(0,axisNo[i],0,0,0); //设置报警使能,关闭报警
                 iret[i] = smc_set_pulse_outmode(0 , axisNo[i], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-                iret[i] = smc_set_profile_unit(0,axisNo[i],startvel[i],runvel[i],acctime[i],dectime[i],stopvel[i]);//设定单轴运动速度参数
+                iret[i] = smc_set_profile_unit(0,axisNo[i],startvel[i],runvel[j][i],acctime[i],dectime[i],stopvel[i]);//设定单轴运动速度参数
                 iret[i] = smc_set_s_profile(0,axisNo[i],0,stime[i]);
 
                 iret[i] = smc_pmove_unit(0,axisNo[i],pulse[j][i],0);
-
 
             }
             while(smc_check_done( 0, 0) == 0 || smc_check_done( 0, 1 ) == 0)
@@ -1098,4 +1117,10 @@ void MainWindow::on_pushButton_changevel_wc_clicked()
 void MainWindow::on_pushButton_changepos_wc_clicked()
 {
 
+}
+
+void MainWindow::on_slider_linear_vel_mouseReleased()
+{
+    double linear_vel=double(ui->slider_linear_vel->value());
+    ui->textEdit_linear_vel->setText(QString::number(linear_vel,'f',3));
 }

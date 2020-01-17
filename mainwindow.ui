@@ -1342,7 +1342,7 @@
     <widget class="QTextEdit" name="textEdit_goal_x">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>120</x>
        <y>290</y>
        <width>61</width>
        <height>31</height>
@@ -1355,7 +1355,7 @@
     <widget class="QTextEdit" name="textEdit_goal_y">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>200</x>
        <y>290</y>
        <width>61</width>
        <height>31</height>
