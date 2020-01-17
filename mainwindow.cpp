@@ -10,8 +10,8 @@
 using Eigen::MatrixXd;
 
 static short connection;
-const double radius = 0.18;
-const double space = 0.555;
+const double radius = 0.164;
+const double space = 0.552;
 const double pi = 3.14159268;
 const double coeff = 2*pi*radius/320000;
 
@@ -866,7 +866,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
     double startvel[2] = {ui->textEdit_startvel->toPlainText().toDouble(),ui->textEdit_startvel_2->toPlainText().toDouble()};
     double runvel[3][2] = {
         {0,0},
-        {v_wheels(1,0),v_wheels(0,0)},
+        {v_wheels(1,0),v_wheels(0,0)}, //左轮为0号电机,右轮为1号电机
         {0,0},
     };
     //限制每个轮子的最大线速度为0.8m/s
@@ -894,8 +894,8 @@ void MainWindow::on_pushButton_start_wc_clicked()
     //}
     ;
 
-    double acctime[2] = {v_wheels(1,0)/150000 ,v_wheels(0,0)/150000};
-    double dectime[2] = {v_wheels(1,0)/150000 ,v_wheels(0,0)/150000};
+    double acctime[2] = {v_wheels(1,0)/100000 ,v_wheels(0,0)/100000};
+    double dectime[2] = {v_wheels(1,0)/100000 ,v_wheels(0,0)/100000};
     double stime[2] = {ui->textEdit_stime->toPlainText().toDouble(),ui->textEdit_stime_2->toPlainText().toDouble()};
 
     int direction[2]={0,0};//因为电机正方向对应的是轮椅的后退反向，所以电机方向默认为负
@@ -1016,16 +1016,16 @@ void MainWindow::on_pushButton_start_wc_clicked()
         pulse_wheels_2=trans*theta_chairs_2;
 
         //step 1:轮椅转到面向终点位置（x,y)的方向
-        pulse[0][0]=-pulse_wheels_1(0,0);
-        pulse[0][1]=-pulse_wheels_1(1,0);
+        pulse[0][0]=-pulse_wheels_1(1,0);
+        pulse[0][1]=-pulse_wheels_1(0,0);//左轮为0号电机,右轮为1号电机
 
         //step 2:轮椅沿直线运动到终点位置（x,y)
         pulse[1][0]=-dist/coeff;
         pulse[1][1]=-dist/coeff;
 
         //step 3:轮椅调整到目标角度goal_theta
-        pulse[2][0]=-pulse_wheels_2(0,0);
-        pulse[2][1]=-pulse_wheels_2(1,0);
+        pulse[2][0]=-pulse_wheels_2(1,0);
+        pulse[2][1]=-pulse_wheels_2(0,0);//左轮为0号电机,右轮为1号电机
 
 
         for(int j=0; j<3; j++)
@@ -1045,6 +1045,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
             {
                 system("pause");
             }
+            sleep(1);
 
         }
 
@@ -1077,7 +1078,7 @@ void MainWindow::on_pushButton_changevel_wc_clicked()
     v_wheels = trans * v_chairs; //由轮椅速度反解出电机速度
 
     short iret[2]={0,0};
-    double runvel[2] = {-v_wheels(1,0),-v_wheels(0,0)};
+    double runvel[2] = {-v_wheels(1,0),-v_wheels(0,0)};//左轮为0号电机,右轮为1号电机
     //限制每个轮子的最大线速度为0.8m/s
     for (int i=0;i<2;i++)
     {
