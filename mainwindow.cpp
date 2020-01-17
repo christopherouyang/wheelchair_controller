@@ -988,19 +988,22 @@ void MainWindow::on_pushButton_start_wc_clicked()
         double dist=sqrt(pow(goal_x,2)+pow(goal_y,2));//计算轮椅起点和终点之间的距离
         double delta_theta=atan2(goal_y,goal_x); //计算轮椅终点和起点连线与轮椅当前位置的角度,取值范围(-pi,pi]
         //如果目标角度和连线角度之间的差值大于pi/2或者小于-pi/2,则将轮椅在第二部分直线运动的前进改为后退
-        if (goal_theta-delta_theta>pi)
+        if(goal_theta<=pi/2 && goal_theta>=-pi/2 && (delta_theta<-pi/2 || delta_theta>pi/2))
         {
-            delta_theta=delta_theta+pi;
-        }
-        else if(goal_theta-delta_theta<-pi)
-        {
-            delta_theta=delta_theta-pi;
+            if (delta_theta<-pi/2)
+            {
+                delta_theta=delta_theta+pi;
+            }
+            else
+            {
+                delta_theta=delta_theta-pi;
+            }
+
         }
         else
         {
             dist=-dist; //如果目标角度和连线角度之间的差值在[-pi/2,pi/2]之内,则轮椅第二部分直线运动为前进,对应到电机的运动方向为负
         }
-
         double pulse[3][2];//定义轮椅两个电机在三段运动中的脉冲数的多维数组
 
         MatrixXd theta_chairs_1(2,1);
@@ -1010,6 +1013,15 @@ void MainWindow::on_pushButton_start_wc_clicked()
         MatrixXd pulse_wheels_1(2,1);
         pulse_wheels_1=trans*theta_chairs_1;
 
+        //如果目标角度和连线角度之间的差值的绝对值大于pi,则将其补回(-pi,pi]的区间内
+        if (goal_theta-delta_theta>pi)
+        {
+            delta_theta=delta_theta+2*pi;
+        }
+        else if(goal_theta-delta_theta<-pi)
+        {
+            delta_theta=delta_theta-2*pi;
+        }
         MatrixXd theta_chairs_2(2,1);
         theta_chairs_2(0,0)=0;
         theta_chairs_2(1,0)=goal_theta-delta_theta;
