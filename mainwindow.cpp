@@ -12,7 +12,7 @@ using Eigen::MatrixXd;
 static short connection;
 const double radius = 0.164;
 const double space = 0.552;
-const double pi = 3.14159268;
+const double pi = 3.14159265358;
 const double coeff = 2*pi*radius/320000;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -856,7 +856,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
     MatrixXd v_wheels(2,1);
     MatrixXd v_chairs(2,1);
     v_chairs(0,0)=ui->textEdit_linear_vel->toPlainText().toDouble();
-    v_chairs(1,0)=ui->textEdit_angular_vel->toPlainText().toDouble()*pi/180;
+    v_chairs(1,0)=ui->textEdit_angular_vel->toPlainText().toDouble()/180*pi;
 
     //v_chairs(0,0)=double(ui->slider_linear_vel->value())/100;
     //v_chairs(1,0)=double(ui->slider_angular_vel->value())*pi/180;
@@ -932,20 +932,6 @@ void MainWindow::on_pushButton_start_wc_clicked()
         iret[i] = smc_set_pulse_outmode(0 , axisNo[i], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
         iret[i] = smc_set_profile_unit(0,axisNo[i],startvel[i],runvel[1][i],acctime[i],dectime[i],stopvel[i]);//设定单轴运动速度参数
         iret[i] = smc_set_s_profile(0,axisNo[i],0,stime[i]);
-
-//        //左轮运动参数
-//        iret[0] = smc_set_equiv( 0, axisNo[0], 1);//设置脉冲当量
-//        iret[0] = smc_set_alm_mode(0,axisNo[0],0,0,0); //设置报警使能,关闭报警
-//        iret[0] = smc_set_pulse_outmode(0 , axisNo[0], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-//        iret[0] = smc_set_profile_unit(0,axisNo[0],startvel[0],runvel[0],acctime[0],dectime[0],stopvel[0]);//设定单轴运动速度参数
-//        iret[0] = smc_set_s_profile(0,axisNo[0],0,stime[0]);
-
-//        //右轮运动参数
-//        iret[1] = smc_set_equiv( 0, axisNo[1], 1);//设置脉冲当量
-//        iret[1] = smc_set_alm_mode(0,axisNo[1],0,0,0); //设置报警使能,关闭报警
-//        iret[1] = smc_set_pulse_outmode(0 , axisNo[1], 0);//设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-//        iret[1] = smc_set_profile_unit(0,axisNo[1],startvel[1],runvel[1],acctime[1],dectime[1],stopvel[1]);//设定单轴运动速度参数
-//        iret[1] = smc_set_s_profile(0,axisNo[1],0,stime[1]);
     }
 
     if (ui->radioButton_cs_2->isChecked())
@@ -958,7 +944,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
         //定义轮椅和电机的终点速度
         MatrixXd v_chairs_end(2,1);
         v_chairs_end(0,0)=ui->textEdit_goal_dv->toPlainText().toDouble();
-        v_chairs_end(1,0)=ui->textEdit_goal_dtheta->toPlainText().toDouble()*pi/180;
+        v_chairs_end(1,0)=ui->textEdit_goal_dtheta->toPlainText().toDouble()/180*pi;
         MatrixXd v_wheels_end(2,1);
         v_wheels_end = trans * v_chairs_end; //由轮椅终点速度反解出电机终点速度
         //stopvel[2][0] = v_wheels_end(0,0);
@@ -981,25 +967,41 @@ void MainWindow::on_pushButton_start_wc_clicked()
         //定义轮椅的终点位置和角度，其中轮椅前进方向为x轴正方向，轮椅左侧垂直于x轴为y轴正方向，逆时针为theta正方向
         double goal_x=ui->textEdit_goal_x->toPlainText().toDouble();
         double goal_y=ui->textEdit_goal_y->toPlainText().toDouble();
-        double goal_theta=ui->textEdit_goal_theta->toPlainText().toDouble()*pi/180;
-        double delta_theta;
-//        if (goal_x==0)
-//        {
-//            if(goal_y>=0)
-//            {
-//                delta_theta = pi/2;
-//            }
-//            else
-//            {
-//                delta_theta = -pi/2;
-//            }
-//        }
-//        else
-//        {
-            delta_theta=atan2(goal_y,goal_x); //计算轮椅终点和起点连线与轮椅当前位置的角度,取值范围(-pi/2,pi/2]
-        //}
-        double dist=sqrt(pow(goal_x,2)+pow(goal_y,2));
-        double pulse[3][2];
+        //获取目标的轮椅角度,并且保证它的取值范围是(-pi,pi]
+        double goal_theta=ui->textEdit_goal_theta->toPlainText().toDouble()/180*pi;
+        if(goal_theta>pi)
+        {
+            while(goal_theta>pi)
+            {
+                goal_theta=goal_theta-2*pi;
+            }
+        }
+        else if(goal_theta<=-pi)
+        {
+            while(goal_theta<=-pi)
+            {
+                goal_theta=goal_theta+2*pi;
+            }
+        }
+
+
+        double dist=sqrt(pow(goal_x,2)+pow(goal_y,2));//计算轮椅起点和终点之间的距离
+        double delta_theta=atan2(goal_y,goal_x); //计算轮椅终点和起点连线与轮椅当前位置的角度,取值范围(-pi,pi]
+        //如果目标角度和连线角度之间的差值大于pi/2或者小于-pi/2,则将轮椅在第二部分直线运动的前进改为后退
+        if (goal_theta-delta_theta>pi)
+        {
+            delta_theta=delta_theta+pi;
+        }
+        else if(goal_theta-delta_theta<-pi)
+        {
+            delta_theta=delta_theta-pi;
+        }
+        else
+        {
+            dist=-dist; //如果目标角度和连线角度之间的差值在[-pi/2,pi/2]之内,则轮椅第二部分直线运动为前进,对应到电机的运动方向为负
+        }
+
+        double pulse[3][2];//定义轮椅两个电机在三段运动中的脉冲数的多维数组
 
         MatrixXd theta_chairs_1(2,1);
         theta_chairs_1(0,0)=0;
@@ -1020,12 +1022,14 @@ void MainWindow::on_pushButton_start_wc_clicked()
         pulse[0][1]=-pulse_wheels_1(0,0);//左轮为0号电机,右轮为1号电机
 
         //step 2:轮椅沿直线运动到终点位置（x,y)
-        pulse[1][0]=-dist/coeff;
-        pulse[1][1]=-dist/coeff;
+        pulse[1][0]=dist/coeff;
+        pulse[1][1]=dist/coeff;
 
         //step 3:轮椅调整到目标角度goal_theta
         pulse[2][0]=-pulse_wheels_2(1,0);
         pulse[2][1]=-pulse_wheels_2(0,0);//左轮为0号电机,右轮为1号电机
+
+
 
 
         for(int j=0; j<3; j++)
@@ -1045,7 +1049,7 @@ void MainWindow::on_pushButton_start_wc_clicked()
             {
                 system("pause");
             }
-            sleep(1);
+            //sleep(0.5);
 
         }
 
@@ -1070,7 +1074,7 @@ void MainWindow::on_pushButton_changevel_wc_clicked()
     MatrixXd v_wheels(2,1);
     MatrixXd v_chairs(2,1);
     v_chairs(0,0)=ui->textEdit_linear_vel->toPlainText().toDouble();
-    v_chairs(1,0)=ui->textEdit_angular_vel->toPlainText().toDouble()*pi/180;
+    v_chairs(1,0)=ui->textEdit_angular_vel->toPlainText().toDouble()/180*pi;
     //v_chairs(0,0)=double(ui->slider_linear_vel->value())/100;
     //v_chairs(1,0)=double(ui->slider_angular_vel->value())*pi/180;
 
