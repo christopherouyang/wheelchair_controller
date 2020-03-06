@@ -120,9 +120,9 @@ void MainWindow::initDialog()
     ui->radioButton_cs_2->click();//默认轮椅运动为匀速运动
     //设定轮椅匀速运动默认参数
     ui->textEdit_linear_vel->setText("0.1"); //默认移动的线速度为0.1m/s
-    ui->slider_linear_vel->setValue(10);
+    //ui->slider_linear_vel->setValue(10);
     ui->textEdit_angular_vel->setText("0");//默认移动的角速度为0
-    ui->slider_angular_vel->setValue(0);
+    //ui->slider_angular_vel->setValue(0);
 
     //轮椅定长运动参数
     ui->textEdit_goal_x->setText("0.2");
@@ -1136,8 +1136,8 @@ void MainWindow::on_pushButton_changepos_wc_clicked()
 
 }
 
-void MainWindow::on_slider_linear_vel_mouseReleased()
-{
-    double linear_vel=double(ui->slider_linear_vel->value());
-    ui->textEdit_linear_vel->setText(QString::number(linear_vel,'f',3));
-}
+//void MainWindow::on_slider_linear_vel_mouseReleased()
+//{
+//    double linear_vel=double(ui->slider_linear_vel->value());
+//    ui->textEdit_linear_vel->setText(QString::number(linear_vel,'f',3));
+//}

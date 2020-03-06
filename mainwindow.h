@@ -58,7 +58,7 @@ private slots:
 
     void on_pushButton_changepos_wc_clicked();
 
-    void on_slider_linear_vel_mouseReleased();
+   // void on_slider_linear_vel_mouseReleased();
 private:
 
     Ui::MainWindow *ui;
