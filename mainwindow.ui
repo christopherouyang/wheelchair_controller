@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1036</width>
     <height>652</height>
    </rect>
   </property>
@@ -19,31 +19,31 @@
      <rect>
       <x>10</x>
       <y>280</y>
-      <width>641</width>
-      <height>181</height>
+      <width>651</width>
+      <height>201</height>
      </rect>
     </property>
     <property name="title">
-     <string>Motion Para</string>
+     <string>Motion Para of Motors</string>
     </property>
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>70</y>
        <width>76</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>startvel</string>
+      <string>Startvel</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_startvel">
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>40</y>
+       <y>60</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -56,20 +56,20 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
+       <y>110</y>
        <width>76</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>runvel</string>
+      <string>Runvel</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_runvel">
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>80</y>
+       <y>100</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -82,7 +82,7 @@
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>120</y>
+       <y>140</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -95,21 +95,21 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>150</y>
        <width>76</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>stopvel</string>
+      <string>Stopvel</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_acctime">
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>40</y>
-       <width>51</width>
+       <y>60</y>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -121,21 +121,21 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>50</y>
+       <y>70</y>
        <width>61</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>acctime</string>
+      <string>Acctime</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_dectime">
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>80</y>
-       <width>51</width>
+       <y>100</y>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -147,20 +147,20 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>90</y>
+       <y>110</y>
        <width>61</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>dectime</string>
+      <string>Dectime</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_destpos">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>40</y>
+       <x>490</x>
+       <y>60</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -172,35 +172,35 @@
     <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>50</y>
+       <x>430</x>
+       <y>70</y>
        <width>61</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>destpos</string>
+      <string>Destpos</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>130</y>
+       <y>150</y>
        <width>41</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>stime</string>
+      <string>Stime</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_stime">
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>120</y>
-       <width>51</width>
+       <y>140</y>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -211,21 +211,21 @@
     <widget class="QLabel" name="label_20">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>90</y>
+       <x>430</x>
+       <y>110</y>
        <width>41</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>pulse</string>
+      <string>Pulse</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_pulse">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>80</y>
+       <x>490</x>
+       <y>100</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -237,21 +237,21 @@
     <widget class="QLabel" name="label_21">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>130</y>
+       <x>430</x>
+       <y>150</y>
        <width>61</width>
        <height>19</height>
       </rect>
      </property>
      <property name="text">
-      <string>direction</string>
+      <string>Direction</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_startvel_2">
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>40</y>
+       <y>60</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -264,7 +264,7 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>80</y>
+       <y>100</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -277,7 +277,7 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>120</y>
+       <y>140</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -289,9 +289,9 @@
     <widget class="QTextEdit" name="textEdit_stime_2">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>120</y>
-       <width>51</width>
+       <x>360</x>
+       <y>140</y>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -302,9 +302,9 @@
     <widget class="QTextEdit" name="textEdit_acctime_2">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>40</y>
-       <width>51</width>
+       <x>360</x>
+       <y>60</y>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -315,9 +315,9 @@
     <widget class="QTextEdit" name="textEdit_dectime_2">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>80</y>
-       <width>51</width>
+       <x>360</x>
+       <y>100</y>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -328,8 +328,8 @@
     <widget class="QTextEdit" name="textEdit_pulse_2">
      <property name="geometry">
       <rect>
-       <x>560</x>
-       <y>80</y>
+       <x>570</x>
+       <y>100</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -341,8 +341,8 @@
     <widget class="QTextEdit" name="textEdit_destpos_2">
      <property name="geometry">
       <rect>
-       <x>560</x>
-       <y>40</y>
+       <x>570</x>
+       <y>60</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -355,7 +355,7 @@
      <property name="geometry">
       <rect>
        <x>560</x>
-       <y>119</y>
+       <y>139</y>
        <width>81</width>
        <height>51</height>
       </rect>
@@ -378,7 +378,7 @@
        </font>
       </property>
       <property name="text">
-       <string>forward</string>
+       <string>Forward</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="radioButton_bw_2">
@@ -396,7 +396,7 @@
        </font>
       </property>
       <property name="text">
-       <string>backward</string>
+       <string>Backward</string>
       </property>
      </widget>
     </widget>
@@ -404,7 +404,7 @@
      <property name="geometry">
       <rect>
        <x>480</x>
-       <y>119</y>
+       <y>139</y>
        <width>81</width>
        <height>51</height>
       </rect>
@@ -428,7 +428,7 @@
        </font>
       </property>
       <property name="text">
-       <string>forward</string>
+       <string>Forward</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="radioButton_bw">
@@ -446,9 +446,105 @@
        </font>
       </property>
       <property name="text">
-       <string>backward</string>
+       <string>Backward</string>
       </property>
      </widget>
+    </widget>
+    <widget class="QLabel" name="label_27">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>30</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Left</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_28">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>30</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Right</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_29">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>30</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Left</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_30">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>30</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Right</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_31">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>30</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Left</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_32">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>30</y>
+       <width>76</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Right</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
     <zorder>groupBox_6</zorder>
     <zorder>groupBox_5</zorder>
@@ -477,6 +573,12 @@
     <zorder>textEdit_dectime_2</zorder>
     <zorder>textEdit_pulse_2</zorder>
     <zorder>textEdit_destpos_2</zorder>
+    <zorder>label_27</zorder>
+    <zorder>label_28</zorder>
+    <zorder>label_29</zorder>
+    <zorder>label_30</zorder>
+    <zorder>label_31</zorder>
+    <zorder>label_32</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -741,12 +843,12 @@
      <rect>
       <x>320</x>
       <y>10</y>
-      <width>331</width>
+      <width>341</width>
       <height>261</height>
      </rect>
     </property>
     <property name="title">
-     <string>Card Control</string>
+     <string>Motor Control</string>
     </property>
     <widget class="QLabel" name="label_16">
      <property name="geometry">
@@ -912,8 +1014,8 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>470</y>
-      <width>641</width>
+      <y>480</y>
+      <width>651</width>
       <height>131</height>
      </rect>
     </property>
@@ -1054,14 +1156,14 @@
    <widget class="QGroupBox" name="groupBox_7">
     <property name="geometry">
      <rect>
-      <x>660</x>
+      <x>670</x>
       <y>10</y>
       <width>351</width>
-      <height>541</height>
+      <height>561</height>
      </rect>
     </property>
     <property name="title">
-     <string>Status of the wheelchair</string>
+     <string>Status of the Wheelchair</string>
     </property>
     <widget class="QTextEdit" name="textEdit_linear_vel">
      <property name="geometry">
@@ -1160,7 +1262,7 @@
     <widget class="QLabel" name="label_15">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>250</x>
        <y>60</y>
        <width>61</width>
        <height>19</height>
@@ -1171,32 +1273,6 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_start_wc">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>410</y>
-       <width>100</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Start</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_changevel_wc">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>470</y>
-       <width>100</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>ChangeVel</string>
      </property>
     </widget>
     <widget class="QSlider" name="slider_linear_vel">
@@ -1436,45 +1512,6 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_decstop_2">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>410</y>
-       <width>100</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Dec Stop</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_emgstop_2">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>470</y>
-       <width>100</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>EMG Stop</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_changepos_wc">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>410</y>
-       <width>100</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>ChangePos</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_39">
      <property name="geometry">
       <rect>
@@ -1521,19 +1558,6 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_exit_2">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>470</y>
-       <width>100</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Exit</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEdit_goal_dtheta">
@@ -1594,6 +1618,128 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <widget class="QGroupBox" name="groupBox_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>400</y>
+       <width>341</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Control of the Wheelchair</string>
+     </property>
+     <widget class="QPushButton" name="pushButton_exit_2">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>90</y>
+        <width>100</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Exit</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_start_wc">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>30</y>
+        <width>100</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_emgstop_2">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>90</y>
+        <width>100</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>EMG Stop</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_changepos_wc">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>30</y>
+        <width>100</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ChangePos</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_changevel_wc">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>90</y>
+        <width>100</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ChangeVel</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_decstop_2">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>30</y>
+        <width>100</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Dec Stop</string>
+      </property>
+     </widget>
+    </widget>
+    <zorder>groupBox_8</zorder>
+    <zorder>textEdit_linear_vel</zorder>
+    <zorder>textEdit_angular_vel</zorder>
+    <zorder>label_11</zorder>
+    <zorder>label_12</zorder>
+    <zorder>textEdit_linear_current_vel</zorder>
+    <zorder>textEdit_angular_current_vel</zorder>
+    <zorder>label_14</zorder>
+    <zorder>label_15</zorder>
+    <zorder>slider_linear_vel</zorder>
+    <zorder>slider_angular_vel</zorder>
+    <zorder>label_17</zorder>
+    <zorder>label_18</zorder>
+    <zorder>label_19</zorder>
+    <zorder>label_23</zorder>
+    <zorder>label_24</zorder>
+    <zorder>textEdit_goal_theta</zorder>
+    <zorder>textEdit_goal_x</zorder>
+    <zorder>textEdit_goal_y</zorder>
+    <zorder>label_25</zorder>
+    <zorder>radioButton_fl_2</zorder>
+    <zorder>label_26</zorder>
+    <zorder>radioButton_cs_2</zorder>
+    <zorder>label_22</zorder>
+    <zorder>label_39</zorder>
+    <zorder>label_40</zorder>
+    <zorder>label_41</zorder>
+    <zorder>textEdit_goal_dtheta</zorder>
+    <zorder>textEdit_goal_dv</zorder>
+    <zorder>label_43</zorder>
+    <zorder>label_44</zorder>
    </widget>
    <zorder>groupBox_4</zorder>
    <zorder>groupBox_3</zorder>
