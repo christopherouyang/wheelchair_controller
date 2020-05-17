@@ -52,7 +52,7 @@ QGroupBox::title {
       <string>Startvel</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_startvel">
+    <widget class="QTextEdit" name="textEdit_startvel_0">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -78,7 +78,7 @@ QGroupBox::title {
       <string>Runvel</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_runvel">
+    <widget class="QTextEdit" name="textEdit_runvel_0">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -91,7 +91,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stopvel">
+    <widget class="QTextEdit" name="textEdit_stopvel_0">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -117,7 +117,7 @@ QGroupBox::title {
       <string>Stopvel</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_acctime">
+    <widget class="QTextEdit" name="textEdit_acctime_0">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -143,7 +143,7 @@ QGroupBox::title {
       <string>Acctime</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_dectime">
+    <widget class="QTextEdit" name="textEdit_dectime_0">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -169,7 +169,7 @@ QGroupBox::title {
       <string>Dectime</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_destpos">
+    <widget class="QTextEdit" name="textEdit_destpos_0">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -208,7 +208,7 @@ QGroupBox::title {
       <string>Stime</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stime">
+    <widget class="QTextEdit" name="textEdit_stime_0">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -234,7 +234,7 @@ QGroupBox::title {
       <string>Pulse</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_pulse">
+    <widget class="QTextEdit" name="textEdit_pulse_0">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -260,7 +260,7 @@ QGroupBox::title {
       <string>Direction</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_startvel_2">
+    <widget class="QTextEdit" name="textEdit_startvel_1">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -273,7 +273,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_runvel_2">
+    <widget class="QTextEdit" name="textEdit_runvel_1">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -286,7 +286,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stopvel_2">
+    <widget class="QTextEdit" name="textEdit_stopvel_1">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -299,7 +299,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stime_2">
+    <widget class="QTextEdit" name="textEdit_stime_1">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -312,7 +312,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_acctime_2">
+    <widget class="QTextEdit" name="textEdit_acctime_1">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -325,7 +325,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_dectime_2">
+    <widget class="QTextEdit" name="textEdit_dectime_1">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -338,7 +338,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_pulse_2">
+    <widget class="QTextEdit" name="textEdit_pulse_1">
      <property name="geometry">
       <rect>
        <x>550</x>
@@ -351,7 +351,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_destpos_2">
+    <widget class="QTextEdit" name="textEdit_destpos_1">
      <property name="geometry">
       <rect>
        <x>550</x>
@@ -376,7 +376,7 @@ QGroupBox::title {
      <property name="title">
       <string/>
      </property>
-     <widget class="QRadioButton" name="radioButton_fw_2">
+     <widget class="QRadioButton" name="radioButton_fw_1">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -394,7 +394,7 @@ QGroupBox::title {
        <string>Forward</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_bw_2">
+     <widget class="QRadioButton" name="radioButton_bw_1">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -428,7 +428,7 @@ QGroupBox::title {
      <property name="title">
       <string/>
      </property>
-     <widget class="QRadioButton" name="radioButton_fw">
+     <widget class="QRadioButton" name="radioButton_fw_0">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -447,7 +447,7 @@ QGroupBox::title {
        <string>Forward</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_bw">
+     <widget class="QRadioButton" name="radioButton_bw_0">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -565,30 +565,30 @@ QGroupBox::title {
     <zorder>groupBox_6</zorder>
     <zorder>groupBox_5</zorder>
     <zorder>label_4</zorder>
-    <zorder>textEdit_startvel</zorder>
+    <zorder>textEdit_startvel_0</zorder>
     <zorder>label_5</zorder>
-    <zorder>textEdit_runvel</zorder>
-    <zorder>textEdit_stopvel</zorder>
+    <zorder>textEdit_runvel_0</zorder>
+    <zorder>textEdit_stopvel_0</zorder>
     <zorder>label_6</zorder>
-    <zorder>textEdit_acctime</zorder>
+    <zorder>textEdit_acctime_0</zorder>
     <zorder>label_7</zorder>
-    <zorder>textEdit_dectime</zorder>
+    <zorder>textEdit_dectime_0</zorder>
     <zorder>label_8</zorder>
-    <zorder>textEdit_destpos</zorder>
+    <zorder>textEdit_destpos_0</zorder>
     <zorder>label_9</zorder>
     <zorder>label_10</zorder>
-    <zorder>textEdit_stime</zorder>
+    <zorder>textEdit_stime_0</zorder>
     <zorder>label_20</zorder>
-    <zorder>textEdit_pulse</zorder>
+    <zorder>textEdit_pulse_0</zorder>
     <zorder>label_21</zorder>
-    <zorder>textEdit_startvel_2</zorder>
-    <zorder>textEdit_runvel_2</zorder>
-    <zorder>textEdit_stopvel_2</zorder>
-    <zorder>textEdit_stime_2</zorder>
-    <zorder>textEdit_acctime_2</zorder>
-    <zorder>textEdit_dectime_2</zorder>
-    <zorder>textEdit_pulse_2</zorder>
-    <zorder>textEdit_destpos_2</zorder>
+    <zorder>textEdit_startvel_1</zorder>
+    <zorder>textEdit_runvel_1</zorder>
+    <zorder>textEdit_stopvel_1</zorder>
+    <zorder>textEdit_stime_1</zorder>
+    <zorder>textEdit_acctime_1</zorder>
+    <zorder>textEdit_dectime_1</zorder>
+    <zorder>textEdit_pulse_1</zorder>
+    <zorder>textEdit_destpos_1</zorder>
     <zorder>label_27</zorder>
     <zorder>label_28</zorder>
     <zorder>label_29</zorder>
@@ -905,32 +905,6 @@ QGroupBox::title {
       <string>Mode</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButton_fl">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>112</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Fixed Length</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="radioButton_cs">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>131</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Constant Speed</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_error">
      <property name="geometry">
       <rect>
@@ -1039,7 +1013,7 @@ QGroupBox::title {
     <property name="title">
      <string>Running Control of Motors</string>
     </property>
-    <widget class="QPushButton" name="pushButton_start">
+    <widget class="QPushButton" name="pushButton_start_0">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1052,7 +1026,7 @@ QGroupBox::title {
       <string>Start</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_decstop">
+    <widget class="QPushButton" name="pushButton_decstop_0">
      <property name="geometry">
       <rect>
        <x>230</x>
@@ -1078,7 +1052,7 @@ QGroupBox::title {
       <string>ChangeVel</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_emgstop">
+    <widget class="QPushButton" name="pushButton_emgstop_0">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1130,7 +1104,7 @@ QGroupBox::title {
       <string>EncPos</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_exit">
+    <widget class="QPushButton" name="pushButton_exit_0">
      <property name="geometry">
       <rect>
        <x>890</x>
@@ -1347,7 +1321,7 @@ QGroupBox::title {
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButton_fl_2">
+    <widget class="QRadioButton" name="radioButton_fl">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -1373,7 +1347,7 @@ QGroupBox::title {
       <string>Mode</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButton_cs_2">
+    <widget class="QRadioButton" name="radioButton_cs">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -1504,7 +1478,7 @@ QGroupBox::title {
      <property name="title">
       <string>Control of the Wheelchair</string>
      </property>
-     <widget class="QPushButton" name="pushButton_exit_2">
+     <widget class="QPushButton" name="pushButton_exit_1">
       <property name="geometry">
        <rect>
         <x>230</x>
@@ -1530,7 +1504,7 @@ QGroupBox::title {
        <string>Start</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_emgstop_2">
+     <widget class="QPushButton" name="pushButton_emgstop_1">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -1569,7 +1543,7 @@ QGroupBox::title {
        <string>ChangeVel</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_decstop_2">
+     <widget class="QPushButton" name="pushButton_decstop_1">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -1596,9 +1570,9 @@ QGroupBox::title {
     <zorder>textEdit_goal_x</zorder>
     <zorder>textEdit_goal_y</zorder>
     <zorder>label_25</zorder>
-    <zorder>radioButton_fl_2</zorder>
+    <zorder>radioButton_fl</zorder>
     <zorder>label_26</zorder>
-    <zorder>radioButton_cs_2</zorder>
+    <zorder>radioButton_cs</zorder>
     <zorder>label_39</zorder>
     <zorder>label_40</zorder>
     <zorder>label_41</zorder>

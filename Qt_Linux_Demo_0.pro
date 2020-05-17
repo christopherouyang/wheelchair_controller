@@ -31,6 +31,7 @@ SOURCES += \
 
 HEADERS += \
         LTSMC.h \
+        enumeration.h \
         mainwindow.h \
         mythread.h
 
