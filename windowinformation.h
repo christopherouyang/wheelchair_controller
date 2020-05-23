@@ -4,7 +4,6 @@
 #include "mainwindow.h"
 
 class WindowInformation : public MainWindow {
-  Q_OBJECT
  public:
   WindowInformation();
 

@@ -231,14 +231,16 @@ void MainWindow::on_pushButton_enable_clicked() {
       bool enable_success[2] = {false};
 
       for (int i = 0; i < 2; i++) {
-        enable_success[i] = enable_axis(i, m_nConnectNo);
+        enable_success[i] = wheelchairstatus->enable_axis(this,i, m_nConnectNo);
       }
       if (enable_success[0] && enable_success[1]) {
         ui->label_error->setText("0、1轴使能成功");
       }
-    } else if (ui->checkBox_axis_0->isChecked() && enable_axis(0, m_nConnectNo) && disable_axis(1, m_nConnectNo)) {
+    } else if (ui->checkBox_axis_0->isChecked() && wheelchairstatus->enable_axis(this,0, m_nConnectNo) &&
+               wheelchairstatus->disable_axis(this,1, m_nConnectNo)) {
       ui->label_error->setText("0轴使能成功");
-    } else if (ui->checkBox_axis_1->isChecked() && enable_axis(1, m_nConnectNo) && disable_axis(0, m_nConnectNo)) {
+    } else if (ui->checkBox_axis_1->isChecked() && wheelchairstatus->enable_axis(this,1, m_nConnectNo) &&
+               wheelchairstatus->disable_axis(this,0, m_nConnectNo)) {
       ui->label_error->setText("1轴使能成功");
     }
   } else  //总线不正常状态下不响应使能操作
@@ -259,7 +261,7 @@ bool MainWindow::on_pushButton_disable_clicked() {
       bool disable_success[2] = {false};
 
       for (int i = 0; i < 2; i++) {
-        disable_success[i] = disable_axis(i, m_nConnectNo);
+        disable_success[i] = wheelchairstatus->disable_axis(this,i, m_nConnectNo);
       }
 
       if (disable_success[0] && disable_success[1]) {
@@ -292,16 +294,16 @@ void MainWindow::on_pushButton_closeio_clicked() {
 void MainWindow::on_pushButton_start_0_clicked() {
   double runvel[2] = {ui->textEdit_runvel_0->toPlainText().toDouble(), ui->textEdit_runvel_1->toPlainText().toDouble()};
   double pulse[2] = {ui->textEdit_pulse_0->toPlainText().toDouble(), ui->textEdit_pulse_1->toPlainText().toDouble()};
-  get_status(0, runvel, pulse);
-  get_status(1, runvel, pulse);
+  wheelchairstatus->get_status(this,0, runvel, pulse);
+  wheelchairstatus->get_status(this,1, runvel, pulse);
 
-  assert(is_ready_to_start());
+  assert(wheelchairstatus->is_ready_to_start(this));
   WORD axisNo[2] = {0, 1};
   if (ui->checkBox_axis_l->isChecked()) {
-    move_axis(axisNo[0]);
+    wheelchairstatus->move_axis(this,axisNo[0]);
   }
   if (ui->checkBox_axis_r->isChecked()) {
-    move_axis(axisNo[0]);
+    wheelchairstatus->move_axis(this,axisNo[0]);
   }
   return;
 }
@@ -431,7 +433,7 @@ void MainWindow::on_pushButton_start_wc_clicked() {
   ui->radioButton_fw_0->click();
   ui->radioButton_fw_1->click();  //默认前进
 
-  assert(is_ready_to_start());
+  assert(wheelchairstatus->is_ready_to_start(this));
 
   int begin = 1;
   int end = 2;
@@ -443,13 +445,13 @@ void MainWindow::on_pushButton_start_wc_clicked() {
     isConstantSpeed = false;
   }
 
-  set_wheelchair_moving_parameter(isConstantSpeed, pulse, runvel);
+  wheelchairstatus->set_wheelchair_moving_parameter(this, isConstantSpeed, pulse, runvel);
   for (int i = begin; i < end; i++) {
-    get_status(0, runvel[i], pulse[i]);
-    get_status(1, runvel[i], pulse[i]);
+    wheelchairstatus->get_status(this, 0, runvel[i], pulse[i]);
+    wheelchairstatus->get_status(this, 1, runvel[i], pulse[i]);
 
-    move_axis(0);
-    move_axis(1);
+    wheelchairstatus->move_axis(this, 0);
+    wheelchairstatus->move_axis(this, 1);
 
     while (smc_check_done(0, 0) == 0 || smc_check_done(0, 1) == 0) {
       system("pause");
@@ -509,4 +511,9 @@ void MainWindow::on_pushButton_exit_0_clicked() {
 }
 void MainWindow::on_pushButton_exit_1_clicked() {
   on_pushButton_exit_0_clicked();  //该按钮和另一个exit效果相同
+}
+
+void MainWindow::information_connection_fail() {
+}
+void MainWindow::information_connection_success() {
 }

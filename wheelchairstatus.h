@@ -3,24 +3,21 @@
 
 #include "mainwindow.h"
 
-class WheelchairStatus : public MainWindow {
+class WheelchairStatus {
  public:
   WheelchairStatus();
+  bool enable_axis(MainWindow *window, int axisNo, int m_nConnectNo);
+  bool disable_axis(MainWindow *window,int axisNo, int m_nConnectNo);
 
- private:
+  void get_status(MainWindow *windowint,int axisNo, double *runvel, double *pulse);
+  void set_wheelchair_moving_parameter(MainWindow *window,bool isConstantSpeed, double pulse[3][2], double runvel[3][2]);
 
+  void set_wheelchair_constant_speed_parameter(MainWindow *window,double runvel[3][2]);
+  void set_wheelchair_fixed_length_parameter(MainWindow *window,double pulse[3][2], double runvel[3][2]);
 
-  virtual bool enable_axis(int axisNo, int m_nConnectNo);
-  virtual bool disable_axis(int axisNo, int m_nConnectNo);
+  bool is_ready_to_start(MainWindow *window);
+  void move_axis(MainWindow *window,int axisNo);
 
-  virtual void get_status(int axisNo, double *runvel, double *pulse);
-  virtual void set_wheelchair_moving_parameter(bool isConstantSpeed, double pulse[3][2], double runvel[3][2]);
-
-  virtual void set_wheelchair_constant_speed_parameter(double runvel[3][2]);
-  virtual void set_wheelchair_fixed_length_parameter(double pulse[3][2], double runvel[3][2]);
-
-  virtual bool is_ready_to_start();
-  virtual void move_axis(int axisNo);
 };
 
 #endif  // WHEELCHAIRSTATUS_H
