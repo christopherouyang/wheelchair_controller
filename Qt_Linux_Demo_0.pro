@@ -50,4 +50,5 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/so/debug/ -lLTSMC
 else:unix: LIBS += -L$$PWD/so/ -lLTSMC
 
 INCLUDEPATH += $$PWD/so
+INCLUDEPATH += /usr/local/Cellar/eigen/3.3.7/include
 DEPENDPATH += $$PWD/so

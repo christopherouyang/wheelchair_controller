@@ -6,10 +6,13 @@ int main(int argc, char *argv[])
 {
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+#ifdef __linux__
     QTextCodec::setCodecForTr(codec);
+#endif
     QTextCodec::setCodecForLocale(codec);
-    QTextCodec::setCodecForCStrings(codec);
-
+#ifdef __linux__
+    //QTextCodec::setCodecForCStrings(codec);
+#endif
 
     QApplication a(argc, argv);
     MainWindow w;
