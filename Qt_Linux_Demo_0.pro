@@ -27,13 +27,17 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        mythread.cpp
+        mythread.cpp \
+        wheelchairstatus.cpp \
+        windowinformation.cpp
 
 HEADERS += \
         LTSMC.h \
         enumeration.h \
         mainwindow.h \
-        mythread.h
+        mythread.h \
+        wheelchairstatus.h \
+        windowinformation.h
 
 FORMS += \
         mainwindow.ui

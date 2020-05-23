@@ -3,110 +3,104 @@
 
 #include <QMainWindow>
 #include <QtCore>
+#include "LTSMC.h"
 #include "mythread.h"
 #include "enumeration.h"
 #include <eigen3/Eigen/Dense>
 
-//extern short connection;
+// extern short connection;
 
 namespace Ui {
 class MainWindow;
 }
 
-struct MovingStatus{
-    double startvel;
-    double runvel;
-    double stopvel;
-    double acctime;
-    double dectime;
-    double stime;
-    double pulse;
-    int direction;
-    MovingMode mode;
-
+struct MovingStatus {
+  double startvel;
+  double runvel;
+  double stopvel;
+  double acctime;
+  double dectime;
+  double stime;
+  double pulse;
+  int direction;
+  MovingMode mode;
 };
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+ public:
+  explicit MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
 
-private slots:
+ private slots:
 
-    void on_pushButton_openio_clicked();
+  void on_pushButton_openio_clicked();
 
-    void on_pushButton_closeio_clicked();
+  void on_pushButton_closeio_clicked();
 
-    void on_pushButton_start_0_clicked();
+  void on_pushButton_start_0_clicked();
 
-    void on_pushButton_decstop_0_clicked();
-    void on_pushButton_decstop_1_clicked();
+  void on_pushButton_decstop_0_clicked();
+  void on_pushButton_decstop_1_clicked();
 
-    void on_pushButton_emgstop_0_clicked();
-    void on_pushButton_emgstop_1_clicked();
+  void on_pushButton_emgstop_0_clicked();
+  void on_pushButton_emgstop_1_clicked();
 
-    void on_pushButton_zeropos_clicked();
+  void on_pushButton_zeropos_clicked();
 
-    void on_pushButton_encpos_clicked();
+  void on_pushButton_encpos_clicked();
 
-    void on_pushButton_stopcrd_clicked();
+  void on_pushButton_stopcrd_clicked();
 
-    bool on_pushButton_disable_clicked();
+  bool on_pushButton_disable_clicked();
 
-    void on_pushButton_changevel_clicked();
+  void on_pushButton_changevel_clicked();
 
-    void on_pushButton_changepos_clicked();
+  void on_pushButton_changepos_clicked();
 
-    void on_pushButton_enable_clicked();
+  void on_pushButton_enable_clicked();
 
-    void on_pushButton_exit_0_clicked();
-    void on_pushButton_exit_1_clicked();
+  void on_pushButton_exit_0_clicked();
+  void on_pushButton_exit_1_clicked();
 
-    void on_pushButton_start_wc_clicked();
+  void on_pushButton_start_wc_clicked();
 
-    void on_pushButton_changevel_wc_clicked();
+  void on_pushButton_changevel_wc_clicked();
+  void on_pushButton_changepos_wc_clicked();
 
-    void on_pushButton_changepos_wc_clicked();
+ protected:
+  Ui::MainWindow *ui;
 
-//    void on_radioButton_fl_1_clicked();
-//    void on_radioButton_fl_0_clicked();
+  MovingStatus status[2];
 
-//    void on_radioButton_cs_1_clicked();
-//    void on_radioButton_cs_0_clicked();
+  Eigen::MatrixXd trans;
 
-   // void on_slider_linear_vel_mouseReleased();
-private:
+  virtual void information_disable();
+  virtual void information_disable_axis(int axisNo);
 
-    Ui::MainWindow *ui;
-    void timerEvent(QTimerEvent *e);
-    void initDialog();
-    void information_connection_fail();
-    void information_connection_success();
-    void information_disable();
-    void information_disable_axis(int axisNo);
-    void information_emgstop_on();
-    void information_connection_interrupted();
+ private:
+  void timerEvent(QTimerEvent *e);
+  void initDialog();
+  virtual void information_connection_fail();
+  virtual void information_connection_success();
 
+  virtual void information_emgstop_on();
+  virtual void information_connection_interrupted();
 
-    bool enable_axis(int axisNo, int m_nConnectNo);
-    bool disable_axis(int axisNo, int m_nConnectNo);
+  virtual bool enable_axis(int axisNo, int m_nConnectNo);
+  virtual bool disable_axis(int axisNo, int m_nConnectNo);
 
-    void get_status(int axisNo,double *runvel, double *pulse);
+  virtual void get_status(int axisNo, double *runvel, double *pulse);
+  virtual void set_wheelchair_moving_parameter(bool isConstantSpeed, double pulse[3][2], double runvel[3][2]);
 
-    void move_axis(int axisNo);
+  virtual bool is_ready_to_start();
+  virtual void move_axis(int axisNo);
 
-    void emg_stop();
+  virtual void emg_stop();
 
-    MovingStatus status[2];
-
-    Eigen::MatrixXd trans;
-
-public:
-    void RefreshUI();
-
+ public:
+  void RefreshUI();
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H
