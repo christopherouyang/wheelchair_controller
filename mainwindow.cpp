@@ -7,7 +7,6 @@
 #include "math.h"
 #include <unistd.h>
 
-using Eigen::MatrixXd;
 
 static short connection;
 const double RADIUS = 0.164;
@@ -17,11 +16,10 @@ const double COEFF = (2 * PI * RADIUS / 320000);
 const double MAX_VEL = 0.8;
 const double VEL_LIMIT = MAX_VEL / COEFF;
 
-void vel_limit(double *runvel) {  //将两轮的速度限制在0.8m/s之内
-
+void vel_limit(double *runvel) {
+  //将两轮的速度限制在0.8m/s之内
   for (int i = 0; i < 2; i++) {
     runvel[i] = runvel[i] > VEL_LIMIT ? VEL_LIMIT : runvel[i];
-
     runvel[i] = runvel[i] < -VEL_LIMIT ? -VEL_LIMIT : runvel[i];
   }
 }
@@ -30,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   ui->setupUi(this);
   initDialog();
   char pconnectstring[] = "192.168.5.11";
+
   connection = smc_board_init(0, 2, pconnectstring, 0);
   if (connection != 0)  //检查控制卡是否连接成功
   {
@@ -41,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     information_connection_success();
   }
 
-  MatrixXd trans_2(2, 2);
+  Eigen::MatrixXd trans_2(2, 2);
   trans_2(0, 0) = 1;
   trans_2(0, 1) = SPACE / 2;
   trans_2(1, 0) = 1;
@@ -616,8 +615,8 @@ void MainWindow::on_pushButton_exit_1_clicked() {
 
 void MainWindow::on_pushButton_start_wc_clicked() {
   //定义轮椅速度向量
-  MatrixXd v_wheels(2, 1);
-  MatrixXd v_chairs(2, 1);
+  Eigen::MatrixXd v_wheels(2, 1);
+  Eigen::MatrixXd v_chairs(2, 1);
 
   v_chairs(0, 0) = ui->textEdit_linear_vel->toPlainText().toDouble();
   v_chairs(1, 0) = ui->textEdit_angular_vel->toPlainText().toDouble() / 180 * PI;
@@ -695,11 +694,11 @@ void MainWindow::on_pushButton_start_wc_clicked() {
     }
     double pulse[3][2];  //定义轮椅两个电机在三段运动中的脉冲数的多维数组
 
-    MatrixXd theta_chairs_1(2, 1);
+    Eigen::MatrixXd theta_chairs_1(2, 1);
     theta_chairs_1(0, 0) = 0;
     theta_chairs_1(1, 0) = delta_theta;
 
-    MatrixXd pulse_wheels_1(2, 1);
+    Eigen::MatrixXd pulse_wheels_1(2, 1);
     pulse_wheels_1 = trans * theta_chairs_1;
 
     //如果目标角度和连线角度之间的差值的绝对值大于pi,则将其补回(-pi,pi]的区间内
@@ -708,11 +707,11 @@ void MainWindow::on_pushButton_start_wc_clicked() {
     } else if (goal_theta - delta_theta < -PI) {
       delta_theta = delta_theta - 2 * PI;
     }
-    MatrixXd theta_chairs_2(2, 1);
+    Eigen::MatrixXd theta_chairs_2(2, 1);
     theta_chairs_2(0, 0) = 0;
     theta_chairs_2(1, 0) = goal_theta - delta_theta;
 
-    MatrixXd pulse_wheels_2(2, 1);
+    Eigen::MatrixXd pulse_wheels_2(2, 1);
     pulse_wheels_2 = trans * theta_chairs_2;
 
     // step 1:轮椅转到面向终点位置（x,y)的方向
@@ -744,8 +743,8 @@ void MainWindow::on_pushButton_start_wc_clicked() {
 
 void MainWindow::on_pushButton_changevel_wc_clicked() {
   //定义轮椅速度矩阵
-  MatrixXd v_wheels(2, 1);
-  MatrixXd v_chairs(2, 1);
+  Eigen::MatrixXd v_wheels(2, 1);
+  Eigen::MatrixXd v_chairs(2, 1);
   v_chairs(0, 0) = ui->textEdit_linear_vel->toPlainText().toDouble();
   v_chairs(1, 0) = ui->textEdit_angular_vel->toPlainText().toDouble() / 180 * PI;
 

@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
 #ifdef __linux__
-    QTextCodec::setCodecForTr(codec);
+    //QTextCodec::setCodecForTr(codec);
 #endif
     QTextCodec::setCodecForLocale(codec);
 #ifdef __linux__
