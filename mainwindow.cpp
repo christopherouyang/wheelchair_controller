@@ -6,9 +6,11 @@
 #include <eigen3/Eigen/Dense>
 #include "math.h"
 #include <unistd.h>
+#include <string>
 
+static short connection = -1;
+constexpr WORD CONNECT_NO = 0;
 
-static short connection;
 const double RADIUS = 0.164;
 const double SPACE = 0.552;
 const double PI = 3.1415926358;
@@ -27,9 +29,9 @@ void vel_limit(double *runvel) {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   initDialog();
-  char pconnectstring[] = "192.168.5.11";
+  char pIpAddress[] = "192.168.5.11";
 
-  connection = smc_board_init(0, 2, pconnectstring, 0);
+  connection = smc_board_init(CONNECT_NO, 2, pIpAddress, 0);
   if (connection != 0)  //检查控制卡是否连接成功
   {
     qDebug("smc_board_init iret = %d\n", connection);
@@ -104,8 +106,8 @@ void MainWindow::initDialog() {
   ui->textEdit_startvel_0->setText("100");
   ui->textEdit_runvel_0->setText("32000");
   ui->textEdit_stopvel_0->setText("100");
-  ui->textEdit_acctime_0->setText("0.1");
-  ui->textEdit_dectime_0->setText("0.1");
+  ui->textEdit_acctime_0->setText("0.2");
+  ui->textEdit_dectime_0->setText("0.2");
   ui->textEdit_stime_0->setText("0.05");
   ui->textEdit_destpos_0->setText("20000");
   ui->textEdit_pulse_0->setText("320000");  //左轮
@@ -113,8 +115,8 @@ void MainWindow::initDialog() {
   ui->textEdit_startvel_1->setText("100");
   ui->textEdit_runvel_1->setText("32000");
   ui->textEdit_stopvel_1->setText("100");
-  ui->textEdit_acctime_1->setText("0.1");
-  ui->textEdit_dectime_1->setText("0.1");
+  ui->textEdit_acctime_1->setText("0.2");
+  ui->textEdit_dectime_1->setText("0.2");
   ui->textEdit_stime_1->setText("0.05");
   ui->textEdit_destpos_1->setText("20000");
   ui->textEdit_pulse_1->setText("320000");  //右轮
@@ -137,6 +139,34 @@ MainWindow::~MainWindow() {
   delete ui;
 }
 
+static QString MovingModeInfo(WORD movingmode) {
+  QString info;
+  switch (movingmode) {
+    case (WORD)MovingMode::standby:
+      info = "Standby";
+      break;
+    case (WORD)MovingMode::fixed_length:
+      info = "Fixed Length";
+      break;
+    case (WORD)MovingMode::constant_speed:
+      info = "Constant Speed";
+      break;
+    default:
+      break;
+  }
+  return info;
+}
+
+static QString StatusInfo(DWORD status) {
+  QString info;
+  if (status == 1) {
+    info = "Static";
+  } else {
+    info = "Running";
+  }
+  return info;
+}
+
 void MainWindow::timerEvent(QTimerEvent *e) {
   short iret[2] = {0, 0};
   double pos[2] = {0.0, 0.0};
@@ -145,62 +175,40 @@ void MainWindow::timerEvent(QTimerEvent *e) {
   double linear_v = 0;
   double angular_v = 0;
   DWORD status[2] = {1, 1};
-  WORD runmode[2] = {0, 0};
+  WORD movingmode[2] = {0, 0};
+  QString info;
+
   for (int i = 0; i < 2; i++) {
     iret[i] = smc_get_position_unit(0, i, &pos[i]);
     iret[i] = smc_get_encoder_unit(0, i, &enc[i]);
     iret[i] = smc_read_current_speed_unit(0, i, &speed[i]);
     status[i] = smc_check_done(0, i);
-    iret[i] = smc_get_axis_run_mode(0, i, &runmode[i]);
+    iret[i] = smc_get_axis_run_mode(0, i, &movingmode[i]);
   }
   //由每个轮子的速度获取轮椅速度，负号是因为电机正方向对应的是轮椅的后退反向
   linear_v = -(speed[0] + speed[1]) * COEFF / 2;
   angular_v = -(speed[1] - speed[0]) * COEFF / SPACE * 180 / PI;
 
-  if (status[0] == 1) {
-    ui->label_status_0->setText("Static");
-  } else {
-    ui->label_status_0->setText("Running");
-  }
+  ui->label_status_0->setText(StatusInfo(status[0]));
+  ui->label_status_0->setText(StatusInfo(status[1]));
 
-  if (status[1] == 1) {
-    ui->label_status_1->setText("Static");
-  } else {
-    ui->label_status_1->setText("Running");
-  }
-
-  if (runmode[0] == 0) {
-    ui->label_mode_0->setText("Standby");
-  } else if (runmode[0] == 1) {
-    ui->label_mode_0->setText("Fixed Length");
-  } else if (runmode[0] == 2) {
-    ui->label_mode_0->setText("Constant Speed");
-  }
-
-  if (runmode[1] == 0) {
-    ui->label_mode_1->setText("Standby");
-  } else if (runmode[1] == 1) {
-    ui->label_mode_1->setText("Fixed Length");
-  } else if (runmode[1] == 2) {
-    ui->label_mode_1->setText("Constant Speed");
-  }
+  ui->label_mode_0->setText(MovingModeInfo(movingmode[0]));
+  ui->label_mode_1->setText(MovingModeInfo(movingmode[1]));
 
   ui->textEdit_prfPosX->setText(QString::number(pos[0], 'f', 3));
   ui->textEdit_prfPosY->setText(QString::number(pos[1], 'f', 3));
-  //
+
   ui->textEdit_encPosX->setText(QString::number(enc[0], 'f', 3));
   ui->textEdit_encPosY->setText(QString::number(enc[1], 'f', 3));
-  //
+
   ui->textEdit_SpeedX->setText(QString::number(speed[0], 'f', 3));
   ui->textEdit_SpeedY->setText(QString::number(speed[1], 'f', 3));
-  //
+
   ui->textEdit_linear_current_vel->setText(QString::number(linear_v, 'f', 3));
   ui->textEdit_angular_current_vel->setText(QString::number(angular_v, 'f', 3));
 
-  short timeout;
-  short status_connect;
-  timeout = smc_set_connect_timeout(0);
-  status_connect = smc_get_connect_status(0);  //读取实时的连接状态
+  short timeout = smc_set_connect_timeout(0);
+  short status_connect = smc_get_connect_status(0);  //读取实时的连接状态
 
   if (connection == 0) {
     emg_stop();               //与控制器连接成功时调用IO急停信号
@@ -250,7 +258,7 @@ void MainWindow::emg_stop() {
   }
 }
 
-bool MainWindow::enable_axis(int axisNo, int m_nConnectNo) {
+bool MainWindow::enable_axis(int axisNo) {
   short iret = 0;
   short statemachine = 1;
 
@@ -259,8 +267,8 @@ bool MainWindow::enable_axis(int axisNo, int m_nConnectNo) {
   t1 = time(NULL);           //设置时间
   while (statemachine == 1)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
   {
-    iret = smc_write_sevon_pin(m_nConnectNo, axisNo, 0);      //设置0轴使能
-    statemachine = smc_read_sevon_pin(m_nConnectNo, axisNo);  //获取0轴状态机
+    iret = smc_write_sevon_pin(CONNECT_NO, axisNo, 0);      //设置0轴使能
+    statemachine = smc_read_sevon_pin(CONNECT_NO, axisNo);  //获取0轴状态机
     t2 = time(NULL);
     if (t2 - t1 > 3)  // 3 秒时间防止死循环
     {
@@ -273,7 +281,7 @@ bool MainWindow::enable_axis(int axisNo, int m_nConnectNo) {
   return true;
 }
 
-bool MainWindow::disable_axis(int axisNo, int m_nConnectNo) {
+bool MainWindow::disable_axis(int axisNo) {
   short iret = 0;
   short statemachine = 0;
 
@@ -282,12 +290,13 @@ bool MainWindow::disable_axis(int axisNo, int m_nConnectNo) {
   t1 = time(NULL);           //设置时间
   while (statemachine == 0)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
   {
-    iret = smc_write_sevon_pin(m_nConnectNo, axisNo, 1);      //设置0轴使能
-    statemachine = smc_read_sevon_pin(m_nConnectNo, axisNo);  //获取0轴状态机
+    iret = smc_write_sevon_pin(CONNECT_NO, axisNo, 1);      //设置0轴使能
+    statemachine = smc_read_sevon_pin(CONNECT_NO, axisNo);  //获取0轴状态机
     t2 = time(NULL);
     if (t2 - t1 > 3)  // 3 秒时间防止死循环
     {
-      QString error = (QString)axisNo + "轴去使能超时，请检查设备";
+      QString wheel = (axisNo == (int)Wheel::left) ? "左" : "右";
+      QString error = wheel + "轮轴去使能超时，请检查设备";
       ui->label_error->setText(error);
       return false;
     }
@@ -298,62 +307,71 @@ bool MainWindow::disable_axis(int axisNo, int m_nConnectNo) {
 void MainWindow::on_pushButton_enable_clicked()  //轴使能操作函数
 {
   unsigned long errcode = 0;  //总线错误代码
-  int m_nConnectNo = 0;
+  bool bRes = false;
+  QString info;
 
-  nmcs_get_errcode(m_nConnectNo, 2, &errcode);  //获取总线状态
-  if (errcode == 0)                             //总线正常才允许使能操作
-  {
-    short emgstop_is_on = smc_read_inbit(0, 0);  //检查急停开关的点平
-    if (emgstop_is_on == 1) {
-      on_pushButton_disable_clicked();
-      information_emgstop_on();
-    } else if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked()) {
-      bool enable_success[2] = {false};
-
-      for (int i = 0; i < 2; i++) {
-        enable_success[i] = enable_axis(i, m_nConnectNo);
-      }
-      if (enable_success[0] && enable_success[1]) {
-        ui->label_error->setText("0、1轴使能成功");
-      }
-    } else if (ui->checkBox_axis_0->isChecked() && enable_axis(0, m_nConnectNo) && disable_axis(1, m_nConnectNo)) {
-      ui->label_error->setText("0轴使能成功");
-    } else if (ui->checkBox_axis_1->isChecked() && enable_axis(1, m_nConnectNo) && disable_axis(0, m_nConnectNo)) {
-      ui->label_error->setText("1轴使能成功");
-    }
-  } else  //总线不正常状态下不响应使能操作
-  {
-    ui->label_error->setText("总线错误，禁止操作！");
+  nmcs_get_errcode(CONNECT_NO, 2, &errcode);  //获取总线状态
+  if (errcode != 0) {
+    //总线不正常状态下不响应使能操作
+    info = "总线错误，禁止操作！";
+    ui->label_error->setText(info);
+    return;
   }
 
-  return;
+  //总线正常才允许使能操作
+  short emgstop_is_on = smc_read_inbit(0, 0);  //检查急停开关的点平
+  if (emgstop_is_on == 1) {
+    on_pushButton_disable_clicked();
+    information_emgstop_on();
+    return;
+  }
+  if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked()) {
+    bRes = enable_axis(0);
+    bRes = enable_axis(1) && bRes;
+
+    info = bRes ? "0、1轴使能成功" : "0、1轴使能失败";
+
+  } else if (ui->checkBox_axis_0->isChecked()) {
+    bRes = enable_axis(0);
+    bRes = disable_axis(1) && bRes;
+    info = bRes ? "0轴使能成功" : "0轴使能失败";
+  } else if (ui->checkBox_axis_1->isChecked()) {
+    bRes = enable_axis(1);
+    bRes = disable_axis(0) && bRes;
+    info = bRes ? "1轴使能成功" : "1轴使能失败";
+  }
+  ui->label_error->setText(info);
 }
 
 bool MainWindow::on_pushButton_disable_clicked()  //轴去使能操作函数
 {
   unsigned long errcode = 1;
-  int m_nConnectNo = 0;
+  bool bRes = false;
+  QString info;
 
-  nmcs_get_errcode(m_nConnectNo, 2, &errcode);  //获取总线状态
-  if (errcode == 0) {
-    if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked()) {
-      bool disable_success[2] = {false};
-
-      for (int i = 0; i < 2; i++) {
-        disable_success[i] = disable_axis(i, m_nConnectNo);
-      }
-
-      if (disable_success[0] && disable_success[1]) {
-        ui->label_error->setText("0、1轴去使能成功");
-        return true;
-      }
-    }
-
-  } else  //总线不正常状态下不响应去使能操作
-  {
-    ui->label_error->setText("总线错误，禁止操作！");
+  nmcs_get_errcode(CONNECT_NO, 2, &errcode);
+  if (errcode != 0) {
+    //总线不正常状态下不响应去使能操作
+    info = "总线错误，禁止操作！";
+    ui->label_error->setText(info);
+    return false;
   }
-  return false;
+
+  if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked()) {
+    bRes = disable_axis(0);
+    bRes = disable_axis(1) && bRes;
+
+    info = bRes ? "0、1轴去使能成功" : "0、1轴去使能失败";
+
+  } else if (ui->checkBox_axis_0->isChecked()) {
+    bRes = disable_axis(0);
+    info = bRes ? "0轴去使能成功" : "0轴去使能失败";
+  } else if (ui->checkBox_axis_1->isChecked()) {
+    bRes = disable_axis(1);
+    info = bRes ? "1轴去使能成功" : "1轴去使能失败";
+  }
+  ui->label_error->setText(info);
+  return bRes;
 }
 
 // open io
@@ -369,9 +387,10 @@ void MainWindow::on_pushButton_closeio_clicked() {
   qDebug("smc_write_outbit(0,%d,1) iret=%d\n", ioNo, iret);
 }
 
-void MainWindow::get_status(int axisNo, double *runvel, double *pulse) {
+void MainWindow::get_status(Wheel wheelNo, double *runvel, double *pulse) {
+  int axisNo = (int)wheelNo;
   vel_limit(runvel);
-  if (axisNo == 0) {
+  if (wheelNo == Wheel::right) {
     status[axisNo].startvel = ui->textEdit_startvel_0->toPlainText().toDouble();
     status[axisNo].runvel = runvel[axisNo];
 
@@ -381,13 +400,9 @@ void MainWindow::get_status(int axisNo, double *runvel, double *pulse) {
     status[axisNo].stime = ui->textEdit_stime_0->toPlainText().toDouble();
     status[axisNo].pulse = pulse[axisNo];
 
-    if (ui->radioButton_fw_0->isChecked()) {
-      status[axisNo].direction = (int)Direction::forward;
-    } else {
-      status[axisNo].direction = (int)Direction::backward;
-    }
+    status[axisNo].direction = ui->radioButton_fw_0->isChecked() ? (int)Direction::forward : (int)Direction::backward;
 
-  } else if (axisNo == 1) {
+  } else if (wheelNo == Wheel::left) {
     status[axisNo].startvel = ui->textEdit_startvel_1->toPlainText().toDouble();
     status[axisNo].runvel = runvel[axisNo];
     status[axisNo].stopvel = ui->textEdit_stopvel_1->toPlainText().toDouble();
@@ -396,83 +411,66 @@ void MainWindow::get_status(int axisNo, double *runvel, double *pulse) {
     status[axisNo].stime = ui->textEdit_stime_1->toPlainText().toDouble();
     status[axisNo].pulse = pulse[axisNo];
 
-    if (ui->radioButton_fw_1->isChecked()) {
-      status[axisNo].direction = (int)Direction::forward;
-    } else {
-      status[axisNo].direction = (int)Direction::backward;
-    }
+    status[axisNo].direction = ui->radioButton_fw_1->isChecked() ? (int)Direction::forward : (int)Direction::backward;
   }
 
-  if (ui->radioButton_fl->isChecked()) {
-    status[axisNo].mode = MovingMode::fixedLength;
-  } else {
-    status[axisNo].mode = MovingMode::constantSpeed;
-  }
+  status[axisNo].mode = ui->radioButton_fl->isChecked() ? MovingMode::fixed_length : MovingMode::constant_speed;
 
   if (status[axisNo].runvel < 0) {
     status[axisNo].direction = 1 - status[axisNo].direction;
     status[axisNo].runvel = -status[axisNo].runvel;
   }
-
-  return;
 }
 
-void MainWindow::move_axis(int axisNo) {
-  short statemachine = 1;
-  ;
-
-  short iret = 0;
-
-  statemachine = smc_read_sevon_pin(0, axisNo);  //获取状态机
+void MainWindow::move_axis(Wheel wheelNo) {
+  int axisNo = (int)wheelNo;
+  short statemachine = smc_read_sevon_pin(0, axisNo);  //获取状态机
   if (statemachine == 1)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
   {
     information_disable_axis(axisNo);  //返回错误信号,停止该函数的运行
     return;
   }
-  iret = smc_set_equiv(0, axisNo, 1);           //设置脉冲当量
+  short iret = smc_set_equiv(0, axisNo, 1);     //设置脉冲当量
   iret = smc_set_alm_mode(0, axisNo, 0, 0, 0);  //设置报警使能,关闭报警
   iret = smc_set_pulse_outmode(0, axisNo, 0);  //设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
   iret = smc_set_profile_unit(0, axisNo, status[axisNo].startvel, status[axisNo].runvel, status[axisNo].acctime,
                               status[axisNo].dectime, status[axisNo].stopvel);  //设定单轴运动速度参数
   iret = smc_set_s_profile(0, axisNo, 0, status[axisNo].stime);
-  if (status[axisNo].mode == MovingMode::fixedLength) {
+  if (status[axisNo].mode == MovingMode::fixed_length) {
     iret = smc_pmove_unit(0, axisNo, status[axisNo].pulse * (2 * status[axisNo].direction - 1), 0);  //相对定长运动
   } else {
     iret = smc_vmove(0, axisNo, status[axisNo].direction);  //恒速运动
   }
-  return;
 }
 
 // start
 void MainWindow::on_pushButton_start_0_clicked() {
   double runvel[2] = {ui->textEdit_runvel_0->toPlainText().toDouble(), ui->textEdit_runvel_1->toPlainText().toDouble()};
   double pulse[2] = {ui->textEdit_pulse_0->toPlainText().toDouble(), ui->textEdit_pulse_1->toPlainText().toDouble()};
-  get_status(0, runvel, pulse);
-  get_status(1, runvel, pulse);
+  get_status(Wheel::left, runvel, pulse);
+  get_status(Wheel::right, runvel, pulse);
 
   short statemachine[2] = {1, 1};
-  WORD axisNo[2] = {0, 1};
-  for (int i = 0; i < 2; i++) {
-    if (smc_check_done(0, axisNo[i]) == 0)  //该轴已经在运动中
+  if (smc_check_done(CONNECT_NO, (WORD)Wheel::left) == 0 ||
+      smc_check_done(CONNECT_NO, (WORD)Wheel::right) == 0) {  //该轴已经在运动中
+    return;
+  }
+  if (ui->checkBox_axis_l->isChecked() && ui->checkBox_axis_r->isChecked()) {
+    statemachine[0] = smc_read_sevon_pin(CONNECT_NO, (WORD)Wheel::left);   //获取0轴状态机
+    statemachine[1] = smc_read_sevon_pin(CONNECT_NO, (WORD)Wheel::right);  //获取1轴状态机
+    //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
+    if (statemachine[1] == 1 || statemachine[0] == 1) {
+      information_disable();  //返回错误信号,停止该函数的运行
       return;
-    if (ui->checkBox_axis_l->isChecked() && ui->checkBox_axis_r->isChecked()) {
-      statemachine[0] = smc_read_sevon_pin(0, 0);  //获取0轴状态机
-      statemachine[1] = smc_read_sevon_pin(0, 1);  //获取1轴状态机
-      if (statemachine[1] == 1 ||
-          statemachine[0] == 1)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
-      {
-        information_disable();  //返回错误信号,停止该函数的运行
-        return;
-      }
     }
   }
+
   if (ui->checkBox_axis_l->isChecked()) {
-    move_axis(axisNo[0]);
+    move_axis(Wheel::left);
   }
   if (ui->checkBox_axis_r->isChecked()) {
-    move_axis(axisNo[0]);
+    move_axis(Wheel::right);
   }
-  return;
 }
 
 // decstop
@@ -498,6 +496,7 @@ void MainWindow::on_pushButton_decstop_0_clicked() {
   }
   return;
 }
+
 void MainWindow::on_pushButton_decstop_1_clicked() {
   on_pushButton_decstop_0_clicked();
 }
@@ -609,6 +608,7 @@ void MainWindow::on_pushButton_exit_0_clicked() {
     qApp->exit(0);
   }
 }
+
 void MainWindow::on_pushButton_exit_1_clicked() {
   on_pushButton_exit_0_clicked();  //该按钮和另一个exit效果相同
 }
@@ -635,28 +635,26 @@ void MainWindow::on_pushButton_start_wc_clicked() {
 
   WORD axisNo[2] = {0, 1};
   short statemachine[2] = {1, 1};
-  for (int i = 0; i < 2; i++) {
-    if (smc_check_done(0, axisNo[i]) == 0)  //该轴已经在运动中
-      return;
-    statemachine[0] = smc_read_sevon_pin(0, 0);  //获取0轴状态机
-    statemachine[1] = smc_read_sevon_pin(0, 1);  //获取1轴状态机
-    if (statemachine[1] == 1 || statemachine[0] == 1)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
-    {
-      information_disable();  //返回错误信号,停止该函数的运行
-      return;
-    }
+
+  if (smc_check_done(CONNECT_NO, (WORD)Wheel::left) == 0 ||
+      smc_check_done(CONNECT_NO, (WORD)Wheel::right) == 0) {  //该轴已经在运动中
+    return;
+  }
+  statemachine[0] = smc_read_sevon_pin(CONNECT_NO, (WORD)Wheel::left);   //获取0轴状态机
+  statemachine[1] = smc_read_sevon_pin(CONNECT_NO, (WORD)Wheel::right);  //获取1轴状态机
+  if (statemachine[1] == 1 || statemachine[0] == 1) {
+    information_disable();  //返回错误信号,停止该函数的运行
+    return;
   }
 
-  if (ui->radioButton_cs->isChecked()) {
+  if (ui->radioButton_cs->isChecked()) {  // constant speed
     double pulse[2] = {0, 0};
-    get_status(0, runvel[1], pulse);
-    get_status(1, runvel[1], pulse);
+    get_status(Wheel::left, runvel[1], pulse);
+    get_status(Wheel::right, runvel[1], pulse);
 
-    move_axis(0);
-    move_axis(1);
-
-  } else if (ui->radioButton_fl->isChecked())  //开始定长运动
-  {
+    move_axis(Wheel::left);
+    move_axis(Wheel::right);
+  } else if (ui->radioButton_fl->isChecked()) {  // fixed length
     //定义电机在轮椅直线运动时的速度大小
     runvel[1][0] = fabs(ui->textEdit_goal_dv->toPlainText().toDouble() / COEFF);
     runvel[1][1] = runvel[1][0];
@@ -678,7 +676,7 @@ void MainWindow::on_pushButton_start_wc_clicked() {
       goal_theta = goal_theta + 2 * PI;
     }
 
-    double dist = sqrt(pow(goal_x, 2) + pow(goal_y, 2));  //计算轮椅起点和终点之间的距离
+    double dist = -sqrt(pow(goal_x, 2) + pow(goal_y, 2));  //计算轮椅起点和终点之间的距离
     double delta_theta = atan2(goal_y, goal_x);  //计算轮椅终点和起点连线与轮椅当前位置的角度,取值范围(-pi,pi]
     //如果目标角度和连线角度之间的差值大于pi/2或者小于-pi/2,则将轮椅在第二部分直线运动的前进改为后退
     if (goal_theta <= PI / 2 && goal_theta >= -PI / 2 && (delta_theta < -PI / 2 || delta_theta > PI / 2)) {
@@ -687,10 +685,9 @@ void MainWindow::on_pushButton_start_wc_clicked() {
       } else {
         delta_theta = delta_theta - PI;
       }
-
     } else {
-      dist =
-          -dist;  //如果目标角度和连线角度之间的差值在[-pi/2,pi/2]之内,则轮椅第二部分直线运动为前进,对应到电机的运动方向为负
+      //如果目标角度和连线角度之间的差值在[-pi/2,pi/2]之内,则轮椅第二部分直线运动为前进,对应到电机的运动方向为负
+      dist = -dist;
     }
     double pulse[3][2];  //定义轮椅两个电机在三段运动中的脉冲数的多维数组
 
@@ -715,28 +712,27 @@ void MainWindow::on_pushButton_start_wc_clicked() {
     pulse_wheels_2 = trans * theta_chairs_2;
 
     // step 1:轮椅转到面向终点位置（x,y)的方向
-    pulse[0][0] = -pulse_wheels_1(1, 0);
-    pulse[0][1] = -pulse_wheels_1(0, 0);  //左轮为0号电机,右轮为1号电机
+    pulse[0][0] = pulse_wheels_1(1, 0);
+    pulse[0][1] = pulse_wheels_1(0, 0);  //左轮为0号电机,右轮为1号电机
 
     // step 2:轮椅沿直线运动到终点位置（x,y)
     pulse[1][0] = dist / COEFF;
     pulse[1][1] = dist / COEFF;
 
     // step 3:轮椅调整到目标角度goal_theta
-    pulse[2][0] = -pulse_wheels_2(1, 0);
-    pulse[2][1] = -pulse_wheels_2(0, 0);  //左轮为0号电机,右轮为1号电机
+    pulse[2][0] = pulse_wheels_2(1, 0);
+    pulse[2][1] = pulse_wheels_2(0, 0);  //左轮为0号电机,右轮为1号电机
 
     for (int i = 0; i < 3; i++) {
-      get_status(0, runvel[i], pulse[i]);
-      get_status(1, runvel[i], pulse[i]);
+      get_status(Wheel::left, runvel[i], pulse[i]);
+      get_status(Wheel::right, runvel[i], pulse[i]);
 
-      move_axis(0);
-      move_axis(1);
+      move_axis(Wheel::left);
+      move_axis(Wheel::right);
 
       while (smc_check_done(0, 0) == 0 || smc_check_done(0, 1) == 0) {
         system("pause");
       }
-      // sleep(0.5);
     }
   }
 }
