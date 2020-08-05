@@ -8,17 +8,19 @@
 #include <unistd.h>
 #include <string>
 
-static short connection = -1;
+static short borad_init_status = (short)ConnectionStatus::unconnected;
 constexpr WORD CARD_NO = 0;
+constexpr WORD EMG_STOP_BIT_NO = 0;
 
-const double RADIUS = 0.164;
-const double SPACE = 0.552;
-const double PI = 3.1415926358;
-const double COEFF = (2 * PI * RADIUS / 320000);
-const double MAX_VEL = 0.8;
-const double VEL_LIMIT = MAX_VEL / COEFF;
+// const parameter for the wheelchair
+constexpr double RADIUS = 0.164;
+constexpr double SPACE = 0.552;
+constexpr double PI = 3.1415926358;
+constexpr double COEFF = (2 * PI * RADIUS / 320000);
+constexpr double MAX_VEL = 0.8;
+constexpr double VEL_LIMIT = MAX_VEL / COEFF;
 
-void vel_limit(double *runvel) {
+static void vel_limit(double *runvel) {
   //将两轮的速度限制在0.8m/s之内
   for (int i = 0; i < 2; i++) {
     runvel[i] = runvel[i] > VEL_LIMIT ? VEL_LIMIT : runvel[i];
@@ -31,10 +33,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   initDialog();
   char pIpAddress[] = "192.168.5.11";
 
-  connection = smc_board_init(CARD_NO, 2, pIpAddress, 0);
-  if (connection != 0)  //检查控制卡是否连接成功
-  {
-    qDebug("smc_board_init iret = %d\n", connection);
+  borad_init_status = smc_board_init(CARD_NO, (WORD)ConnectType::ethercat, pIpAddress, 0);
+  if (borad_init_status != (short)ConnectionStatus::connected) {  //检查控制卡是否连接成功
+    qDebug("smc_board_init iret = %d\n", borad_init_status);
     qDebug("连接失败！请检查控制卡的连接");
     information_connection_fail();
   } else {
@@ -47,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   trans_2(0, 1) = SPACE / 2;
   trans_2(1, 0) = 1;
   trans_2(1, 1) = -SPACE / 2;
-
   trans = trans_2 / COEFF;
 
   startTimer(200);  //定义类QTimerEvent的刷新时间(ms)
@@ -210,7 +210,7 @@ void MainWindow::timerEvent(QTimerEvent *e) {
   short timeout = smc_set_connect_timeout(0);
   short status_connect = smc_get_connect_status(CARD_NO);  //读取实时的连接状态
 
-  if (connection == 0) {
+  if (borad_init_status == 0) {
     emg_stop();               //与控制器连接成功时调用IO急停信号
     if (status_connect != 1)  //如果连接失败,则立刻急停
     {
@@ -238,7 +238,7 @@ void MainWindow::emg_stop() {
   WORD Mylogic[2] = {1, 1};                                  //急停信号高电平有效
   /*********************函数调用执行**************************/
   //第一步、设置轴 IO 映射，将通用输入 0 作为各轴的急停信号
-  short io_0 = smc_read_inbit(CARD_NO, 0);  //读取IO口的电平值
+  short io_0 = smc_read_inbit(CARD_NO, EMG_STOP_BIT_NO);  //读取IO口的电平值
 
   for (int i = 0; i < 2; i++) {
     ret[i] = smc_set_axis_io_map(CARD_NO, Myaxis[i], 3, 6, 0, 0);
@@ -258,16 +258,13 @@ void MainWindow::emg_stop() {
 }
 
 bool MainWindow::enable_axis(int axisNo) {
-  short iret = 0;
-  short statemachine = 1;
-
+  short statemachine = (short)AxisEnableStatus::off;
   time_t t1, t2;
 
-  t1 = time(NULL);           //设置时间
-  while (statemachine == 1)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
-  {
-    iret = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)EnableStatus::on);  //设置0轴使能
-    statemachine = smc_read_sevon_pin(CARD_NO, axisNo);                   //获取0轴状态机
+  t1 = time(NULL);  //设置时间
+  while (statemachine == (short)AxisEnableStatus::off) {
+    short iret = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)AxisEnableStatus::on);
+    statemachine = smc_read_sevon_pin(CARD_NO, axisNo);
     t2 = time(NULL);
     if (t2 - t1 > 3)  // 3 秒时间防止死循环
     {
@@ -281,16 +278,14 @@ bool MainWindow::enable_axis(int axisNo) {
 }
 
 bool MainWindow::disable_axis(int axisNo) {
-  short iret = 0;
-  short statemachine = 0;
+  short statemachine = (short)AxisEnableStatus::on;
 
   time_t t1, t2;
 
-  t1 = time(NULL);           //设置时间
-  while (statemachine == 0)  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
-  {
-    iret = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)EnableStatus::off);  //设置0轴使能
-    statemachine = smc_read_sevon_pin(CARD_NO, axisNo);                    //获取0轴状态机
+  t1 = time(NULL);  //设置时间
+  while (statemachine == (short)AxisEnableStatus::on) {
+    short iret = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)AxisEnableStatus::off);
+    statemachine = smc_read_sevon_pin(CARD_NO, axisNo);
     t2 = time(NULL);
     if (t2 - t1 > 3)  // 3 秒时间防止死循环
     {
@@ -309,7 +304,7 @@ void MainWindow::on_pushButton_enable_clicked()  //轴使能操作函数
   bool bRes = false;
   QString info;
 
-  nmcs_get_errcode(CARD_NO, 2, &errcode);  //获取总线状态
+  nmcs_get_errcode(CARD_NO, (WORD)ConnectType::ethercat, &errcode);  //获取总线状态
   if (errcode != 0) {
     //总线不正常状态下不响应使能操作
     info = "总线错误，禁止操作！";
@@ -318,7 +313,7 @@ void MainWindow::on_pushButton_enable_clicked()  //轴使能操作函数
   }
 
   //总线正常才允许使能操作
-  short emgstop_is_on = smc_read_inbit(CARD_NO, 0);  //检查急停开关的电平
+  short emgstop_is_on = smc_read_inbit(CARD_NO, EMG_STOP_BIT_NO);  //检查急停开关的电平
   if (emgstop_is_on == (short)ElectricalLevel::high) {
     on_pushButton_disable_clicked();
     information_emgstop_on();
@@ -425,9 +420,9 @@ void MainWindow::get_status(Wheel wheelNo, double *runvel, double *pulse) {
 
 void MainWindow::move_axis(Wheel wheelNo) {
   int axisNo = (int)wheelNo;
-  short statemachine = smc_read_sevon_pin(CARD_NO, axisNo);  //获取状态机
-  if (statemachine == 1) {  //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
-    information_disable_axis(axisNo);  //返回错误信号,停止该函数的运行
+  short statemachine = smc_read_sevon_pin(CARD_NO, axisNo);
+  if (statemachine == (short)AxisEnableStatus::off) {
+    information_disable_axis(axisNo);
     return;
   }
   short iret = smc_set_equiv(CARD_NO, axisNo, 1);     //设置脉冲当量
@@ -451,7 +446,7 @@ void MainWindow::on_pushButton_start_0_clicked() {
   get_status(Wheel::left, runvel, pulse);
   get_status(Wheel::right, runvel, pulse);
 
-  short statemachine[2] = {(short)EnableStatus::off, (short)EnableStatus::off};
+  short statemachine[2] = {(short)AxisEnableStatus::off, (short)AxisEnableStatus::off};
   if (smc_check_done(CARD_NO, (WORD)Wheel::left) == 0 ||
       smc_check_done(CARD_NO, (WORD)Wheel::right) == 0) {  //该轴已经在运动中
     return;
@@ -460,7 +455,7 @@ void MainWindow::on_pushButton_start_0_clicked() {
     statemachine[0] = smc_read_sevon_pin(CARD_NO, (WORD)Wheel::left);   //获取0轴状态机
     statemachine[1] = smc_read_sevon_pin(CARD_NO, (WORD)Wheel::right);  //获取1轴状态机
     //监控轴状态机的值，该值等于0表示轴已经使能,等于1则表示该轴未使能
-    if (statemachine[1] == (short)EnableStatus::off || statemachine[0] == (short)EnableStatus::off) {
+    if (statemachine[1] == (short)AxisEnableStatus::off || statemachine[0] == (short)AxisEnableStatus::off) {
       information_disable();  //返回错误信号,停止该函数的运行
       return;
     }
@@ -594,19 +589,14 @@ void MainWindow::on_pushButton_changepos_clicked() {
 
 // exit board&application
 void MainWindow::on_pushButton_exit_0_clicked() {
-  if (connection == 0) {
-    bool disable_success = false;
-    disable_success = MainWindow::on_pushButton_disable_clicked();
-    if (disable_success == true) {
-      smc_board_close(0);
-      qApp->exit(0);
-    } else {
+  if (borad_init_status == (short)ConnectionStatus::connected) {
+    bool disable_success = MainWindow::on_pushButton_disable_clicked();
+    if (disable_success == false) {
       return;
     }
-  } else {
-    smc_board_close(0);
-    qApp->exit(0);
   }
+  smc_board_close(0);
+  qApp->exit(0);
 }
 
 void MainWindow::on_pushButton_exit_1_clicked() {
