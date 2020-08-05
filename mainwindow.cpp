@@ -11,6 +11,7 @@
 static short borad_init_status = (short)ConnectionStatus::unconnected;
 constexpr WORD CARD_NO = 0;
 constexpr WORD EMG_STOP_BIT_NO = 0;
+constexpr DWORD ERROR_CODE_SUCCESS = 0;
 
 // const parameter for the wheelchair
 constexpr double RADIUS = 0.164;
@@ -28,6 +29,34 @@ static void vel_limit(double *runvel) {
   }
 }
 
+static QString MovingModeInfo(WORD movingmode) {
+  QString info;
+  switch (movingmode) {
+    case (WORD)MovingMode::standby:
+      info = "Standby";
+      break;
+    case (WORD)MovingMode::fixedLength:
+      info = "Fixed Length";
+      break;
+    case (WORD)MovingMode::constantSpeed:
+      info = "Constant Speed";
+      break;
+    default:
+      break;
+  }
+  return info;
+}
+
+static QString StatusInfo(DWORD status) {
+  QString info;
+  if (status == 1) {
+    info = "Static";
+  } else {
+    info = "Running";
+  }
+  return info;
+}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   initDialog();
@@ -35,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   borad_init_status = smc_board_init(CARD_NO, (WORD)ConnectType::ethercat, pIpAddress, 0);
   if (borad_init_status != (short)ConnectionStatus::connected) {  //检查控制卡是否连接成功
-    qDebug("smc_board_init iret = %d\n", borad_init_status);
+    qDebug("smc_board_init iRet = %d\n", borad_init_status);
     qDebug("连接失败！请检查控制卡的连接");
     information_connection_fail();
   } else {
@@ -92,9 +121,6 @@ void MainWindow::information_connection_interrupted() {
 void MainWindow::initDialog() {
   ui->textEdit_PortNo->setText("0");  //默认port_no为0
 
-  ui->checkBox_axis_0->click();
-  ui->checkBox_axis_1->click();  //默认两个轮椅的使能状态都被选中
-
   //设定两个轮子单独运动时，电机速度等参数的默认值
   ui->checkBox_axis_l->click();
   ui->checkBox_axis_r->click();  //默认两个轮子的运动都被选中
@@ -139,36 +165,8 @@ MainWindow::~MainWindow() {
   delete ui;
 }
 
-static QString MovingModeInfo(WORD movingmode) {
-  QString info;
-  switch (movingmode) {
-    case (WORD)MovingMode::standby:
-      info = "Standby";
-      break;
-    case (WORD)MovingMode::fixed_length:
-      info = "Fixed Length";
-      break;
-    case (WORD)MovingMode::constant_speed:
-      info = "Constant Speed";
-      break;
-    default:
-      break;
-  }
-  return info;
-}
-
-static QString StatusInfo(DWORD status) {
-  QString info;
-  if (status == 1) {
-    info = "Static";
-  } else {
-    info = "Running";
-  }
-  return info;
-}
-
 void MainWindow::timerEvent(QTimerEvent *e) {
-  short iret[2] = {0, 0};
+  short iRet[2] = {0, 0};
   double pos[2] = {0.0, 0.0};
   double enc[2] = {0.0, 0.0};
   double speed[2] = {0.0, 0.0};
@@ -179,11 +177,11 @@ void MainWindow::timerEvent(QTimerEvent *e) {
   QString info;
 
   for (int i = 0; i < 2; i++) {
-    iret[i] = smc_get_position_unit(CARD_NO, i, &pos[i]);
-    iret[i] = smc_get_encoder_unit(CARD_NO, i, &enc[i]);
-    iret[i] = smc_read_current_speed_unit(CARD_NO, i, &speed[i]);
+    iRet[i] = smc_get_position_unit(CARD_NO, i, &pos[i]);
+    iRet[i] = smc_get_encoder_unit(CARD_NO, i, &enc[i]);
+    iRet[i] = smc_read_current_speed_unit(CARD_NO, i, &speed[i]);
     status[i] = smc_check_done(CARD_NO, i);
-    iret[i] = smc_get_axis_run_mode(CARD_NO, i, &movingmode[i]);
+    iRet[i] = smc_get_axis_run_mode(CARD_NO, i, &movingmode[i]);
   }
   //由每个轮子的速度获取轮椅速度，负号是因为电机正方向对应的是轮椅的后退反向
   linear_v = -(speed[0] + speed[1]) * COEFF / 2;
@@ -215,7 +213,7 @@ void MainWindow::timerEvent(QTimerEvent *e) {
     if (status_connect != 1)  //如果连接失败,则立刻急停
     {
       for (int i = 0; i < 2; i++) {
-        iret[i] = smc_stop(CARD_NO, i, 0);
+        iRet[i] = smc_stop(CARD_NO, i, 0);
       }
       on_pushButton_disable_clicked();
       information_connection_interrupted();
@@ -232,28 +230,30 @@ void MainWindow::timerEvent(QTimerEvent *e) {
 // IO 急停信号
 void MainWindow::emg_stop() {
   /*********************变量定义****************************/
-  WORD Myaxis[2] = {(WORD)Wheel::left, (WORD)Wheel::right};  //轴号
-  short ret[2] = {0, 0};                                     //错误返回
-  WORD Myenable[2] = {1, 1};                                 //急停信号使能
-  WORD Mylogic[2] = {1, 1};                                  //急停信号高电平有效
+  WORD axisNo[2] = {(WORD)Wheel::left, (WORD)Wheel::right};   //轴号
+  short ret[2] = {0, 0};                                      //错误返回
+  WORD enableStatus[2] = {(WORD)SignalEnableStatus::enable};  //急停信号使能
+  WORD elecLevel[2] = {(WORD)ElectricalLevel::high};          //急停信号高电平有效
+  double filterTime = 0;
   /*********************函数调用执行**************************/
   //第一步、设置轴 IO 映射，将通用输入 0 作为各轴的急停信号
   short io_0 = smc_read_inbit(CARD_NO, EMG_STOP_BIT_NO);  //读取IO口的电平值
 
   for (int i = 0; i < 2; i++) {
-    ret[i] = smc_set_axis_io_map(CARD_NO, Myaxis[i], 3, 6, 0, 0);
+    ret[i] = smc_set_axis_io_map(CARD_NO, axisNo[i], (WORD)IoType::AxisIoInMsg_EMG, (WORD)MapIoType::AxisIoInPort_IO,
+                                 EMG_STOP_BIT_NO, filterTime);
   }
   //第二步、设置 EMG 使能，高电平有效
   for (int i = 0; i < 2; i++) {
-    ret[i] = smc_set_emg_mode(CARD_NO, Myaxis[i], Myenable[i], Mylogic[i]);
+    ret[i] = smc_set_emg_mode(CARD_NO, axisNo[i], enableStatus[i], elecLevel[i]);
   }
   if (io_0 == 1) {
     on_pushButton_disable_clicked();
   }
   //第三步、回读 EMG 使能，高电平有效
   for (int i = 0; i < 2; i++) {
-    ret[i] = smc_get_emg_mode(CARD_NO, Myaxis[i], &Myenable[i], &Mylogic[i]);
-    printf("%d 轴急停信号参数,使能,有效电平= %d %d\n ", i, Myenable[i], Mylogic[i]);
+    ret[i] = smc_get_emg_mode(CARD_NO, axisNo[i], &enableStatus[i], &elecLevel[i]);
+    printf("%d 轴急停信号参数,使能,有效电平= %d %d\n ", i, enableStatus[i], elecLevel[i]);
   }
 }
 
@@ -263,7 +263,7 @@ bool MainWindow::enable_axis(int axisNo) {
 
   t1 = time(NULL);  //设置时间
   while (statemachine == (short)AxisEnableStatus::off) {
-    short iret = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)AxisEnableStatus::on);
+    short iRet = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)AxisEnableStatus::on);
     statemachine = smc_read_sevon_pin(CARD_NO, axisNo);
     t2 = time(NULL);
     if (t2 - t1 > 3)  // 3 秒时间防止死循环
@@ -279,12 +279,11 @@ bool MainWindow::enable_axis(int axisNo) {
 
 bool MainWindow::disable_axis(int axisNo) {
   short statemachine = (short)AxisEnableStatus::on;
-
   time_t t1, t2;
 
   t1 = time(NULL);  //设置时间
   while (statemachine == (short)AxisEnableStatus::on) {
-    short iret = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)AxisEnableStatus::off);
+    short iRet = smc_write_sevon_pin(CARD_NO, axisNo, (WORD)AxisEnableStatus::off);
     statemachine = smc_read_sevon_pin(CARD_NO, axisNo);
     t2 = time(NULL);
     if (t2 - t1 > 3)  // 3 秒时间防止死循环
@@ -298,14 +297,13 @@ bool MainWindow::disable_axis(int axisNo) {
   return true;
 }
 
-void MainWindow::on_pushButton_enable_clicked()  //轴使能操作函数
-{
-  unsigned long errcode = 0;  //总线错误代码
+void MainWindow::on_pushButton_enable_clicked() {
+  DWORD errcode = ERROR_CODE_SUCCESS;  //总线错误代码
   bool bRes = false;
   QString info;
 
   nmcs_get_errcode(CARD_NO, (WORD)ConnectType::ethercat, &errcode);  //获取总线状态
-  if (errcode != 0) {
+  if (errcode != ERROR_CODE_SUCCESS) {
     //总线不正常状态下不响应使能操作
     info = "总线错误，禁止操作！";
     ui->label_error->setText(info);
@@ -313,58 +311,62 @@ void MainWindow::on_pushButton_enable_clicked()  //轴使能操作函数
   }
 
   //总线正常才允许使能操作
-  short emgstop_is_on = smc_read_inbit(CARD_NO, EMG_STOP_BIT_NO);  //检查急停开关的电平
-  if (emgstop_is_on == (short)ElectricalLevel::high) {
+  short emgstopStatus = smc_read_inbit(CARD_NO, EMG_STOP_BIT_NO);  //检查急停开关的电平
+  if (emgstopStatus == (short)SignalEnableStatus::enable) {
     on_pushButton_disable_clicked();
     information_emgstop_on();
     return;
   }
-  bool b;
-  if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked()) {
-    bRes = enable_axis(0);
-    bRes = enable_axis(1) && bRes;
-
-    info = bRes ? "0、1轴使能成功" : "0、1轴使能失败";
-
-  } else if (ui->checkBox_axis_0->isChecked()) {
-    bRes = enable_axis(0);
-    bRes = disable_axis(1) && bRes;
-    info = bRes ? "0轴使能成功" : "0轴使能失败";
-  } else if (ui->checkBox_axis_1->isChecked()) {
-    bRes = enable_axis(1);
-    bRes = disable_axis(0) && bRes;
-    info = bRes ? "1轴使能成功" : "1轴使能失败";
+  bool bLeftAxisChecked = ui->checkBox_axis_l->isChecked();
+  bool bRightAxisChecked = ui->checkBox_axis_r->isChecked();
+  if (!bLeftAxisChecked && !bRightAxisChecked) {
+    return;
   }
+  if (bLeftAxisChecked && bLeftAxisChecked) {
+    bRes = enable_axis((WORD)Wheel::left);
+    bRes = enable_axis((WORD)Wheel::right) && bRes;
+    info = bRes ? "左&右轴使能成功" : "左&右轴使能失败";
+  } else {
+    Wheel axisToEnable = bLeftAxisChecked ? Wheel::left : Wheel::right;
+    Wheel axisToDisable = bLeftAxisChecked ? Wheel::right : Wheel::left;
 
+    bRes = enable_axis((WORD)axisToEnable);
+    bRes = disable_axis((WORD)axisToDisable) && bRes;
+
+    info = bLeftAxisChecked ? "左" : "右";
+    info += bRes ? "轴使能成功" : "轴使能失败";
+  }
   ui->label_error->setText(info);
 }
 
-bool MainWindow::on_pushButton_disable_clicked()  //轴去使能操作函数
-{
-  unsigned long errcode = 1;
+bool MainWindow::on_pushButton_disable_clicked() {
+  DWORD errcode = ERROR_CODE_SUCCESS;
   bool bRes = false;
   QString info;
 
-  nmcs_get_errcode(CARD_NO, 2, &errcode);
-  if (errcode != 0) {
+  nmcs_get_errcode(CARD_NO, (WORD)ConnectType::ethercat, &errcode);
+  if (errcode != ERROR_CODE_SUCCESS) {
     //总线不正常状态下不响应去使能操作
     info = "总线错误，禁止操作！";
     ui->label_error->setText(info);
     return false;
   }
 
-  if (ui->checkBox_axis_0->isChecked() && ui->checkBox_axis_1->isChecked()) {
-    bRes = disable_axis(0);
-    bRes = disable_axis(1) && bRes;
+  bool bLeftAxisChecked = ui->checkBox_axis_l->isChecked();
+  bool bRightAxisChecked = ui->checkBox_axis_r->isChecked();
+  if (!bLeftAxisChecked && !bRightAxisChecked) {
+    return false;
+  }
+  if (bLeftAxisChecked && bLeftAxisChecked) {
+    bRes = disable_axis((WORD)Wheel::left);
+    bRes = disable_axis((WORD)Wheel::right) && bRes;
+    info = bRes ? "左&右轴去使能成功" : "左&右轴去使能失败";
+  } else {
+    Wheel axisToDisable = bLeftAxisChecked ? Wheel::left : Wheel::right;
+    bRes = disable_axis((WORD)axisToDisable);
 
-    info = bRes ? "0、1轴去使能成功" : "0、1轴去使能失败";
-
-  } else if (ui->checkBox_axis_0->isChecked()) {
-    bRes = disable_axis(0);
-    info = bRes ? "0轴去使能成功" : "0轴去使能失败";
-  } else if (ui->checkBox_axis_1->isChecked()) {
-    bRes = disable_axis(1);
-    info = bRes ? "1轴去使能成功" : "1轴去使能失败";
+    info = bLeftAxisChecked ? "左" : "右";
+    info += bRes ? "轴去使能成功" : "轴去使能失败";
   }
   ui->label_error->setText(info);
   return bRes;
@@ -373,14 +375,14 @@ bool MainWindow::on_pushButton_disable_clicked()  //轴去使能操作函数
 // open io
 void MainWindow::on_pushButton_openio_clicked() {
   WORD ioNo = ui->textEdit_PortNo->toPlainText().toShort();
-  short iret = smc_write_outbit(CARD_NO, ioNo, 0);
-  qDebug("smc_write_outbit(0,%d,0) iret=%d\n", ioNo, iret);
+  short iRet = smc_write_outbit(CARD_NO, ioNo, (WORD)IoStatus::on);
+  qDebug("smc_write_outbit(0,%d,0) iRet=%d\n", ioNo, iRet);
 }
 // close io
 void MainWindow::on_pushButton_closeio_clicked() {
   WORD ioNo = ui->textEdit_PortNo->toPlainText().toShort();
-  short iret = smc_write_outbit(CARD_NO, ioNo, 1);
-  qDebug("smc_write_outbit(0,%d,1) iret=%d\n", ioNo, iret);
+  short iRet = smc_write_outbit(CARD_NO, ioNo, (WORD)IoStatus::on);
+  qDebug("smc_write_outbit(0,%d,1) iRet=%d\n", ioNo, iRet);
 }
 
 void MainWindow::get_status(Wheel wheelNo, double *runvel, double *pulse) {
@@ -410,7 +412,7 @@ void MainWindow::get_status(Wheel wheelNo, double *runvel, double *pulse) {
     status[axisNo].direction = ui->radioButton_fw_1->isChecked() ? (int)Direction::forward : (int)Direction::backward;
   }
 
-  status[axisNo].mode = ui->radioButton_fl->isChecked() ? MovingMode::fixed_length : MovingMode::constant_speed;
+  status[axisNo].mode = ui->radioButton_fl->isChecked() ? MovingMode::fixedLength : MovingMode::constantSpeed;
 
   if (status[axisNo].runvel < 0) {
     status[axisNo].direction = 1 - status[axisNo].direction;
@@ -425,17 +427,17 @@ void MainWindow::move_axis(Wheel wheelNo) {
     information_disable_axis(axisNo);
     return;
   }
-  short iret = smc_set_equiv(CARD_NO, axisNo, 1);     //设置脉冲当量
-  iret = smc_set_alm_mode(CARD_NO, axisNo, 0, 0, 0);  //设置报警使能,关闭报警
-  iret = smc_set_pulse_outmode(CARD_NO, axisNo, 0);  //设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
-  iret = smc_set_profile_unit(CARD_NO, axisNo, status[axisNo].startvel, status[axisNo].runvel, status[axisNo].acctime,
+  short iRet = smc_set_equiv(CARD_NO, axisNo, 1);     //设置脉冲当量
+  iRet = smc_set_alm_mode(CARD_NO, axisNo, 0, 0, 0);  //设置报警使能,关闭报警
+  iRet = smc_set_pulse_outmode(CARD_NO, axisNo, 0);  //设定脉冲模式（此处脉冲模式固定为 P+D 方向：脉冲+方向）
+  iRet = smc_set_profile_unit(CARD_NO, axisNo, status[axisNo].startvel, status[axisNo].runvel, status[axisNo].acctime,
                               status[axisNo].dectime, status[axisNo].stopvel);  //设定单轴运动速度参数
-  iret = smc_set_s_profile(CARD_NO, axisNo, 0, status[axisNo].stime);
-  if (status[axisNo].mode == MovingMode::fixed_length) {
-    iret =
+  iRet = smc_set_s_profile(CARD_NO, axisNo, 0, status[axisNo].stime);
+  if (status[axisNo].mode == MovingMode::fixedLength) {
+    iRet =
         smc_pmove_unit(CARD_NO, axisNo, status[axisNo].pulse * (2 * status[axisNo].direction - 1), 0);  //相对定长运动
   } else {
-    iret = smc_vmove(CARD_NO, axisNo, status[axisNo].direction);  //恒速运动
+    iRet = smc_vmove(CARD_NO, axisNo, status[axisNo].direction);  //恒速运动
   }
 }
 
@@ -473,10 +475,10 @@ void MainWindow::on_pushButton_start_0_clicked() {
 void MainWindow::on_pushButton_decstop_0_clicked() {
   double dectime[2] = {ui->textEdit_dectime_0->toPlainText().toDouble(),
                        ui->textEdit_dectime_1->toPlainText().toDouble()};
-  short iret[2] = {0, 0};
+  short iRet[2] = {0, 0};
   double actuvel[2];
   for (int i = 0; i < 2; i++) {
-    iret[i] = smc_read_current_speed_unit(0, i, &actuvel[i]);
+    iRet[i] = smc_read_current_speed_unit(CARD_NO, i, &actuvel[i]);
     double acc = fabs(actuvel[i] / dectime[i]);
     if (acc > 20000) {
       dectime[i] = fabs(actuvel[i] / 100000);  //如果减速的加速度>100000,修改减速时间使得加速度为100000
@@ -487,7 +489,7 @@ void MainWindow::on_pushButton_decstop_0_clicked() {
 
   for (int axisNo = 0; axisNo < 2; axisNo++) {
     smc_set_dec_stop_time(CARD_NO, axisNo, dectime[axisNo]);  //设置减速停止时间
-    iret[axisNo] = smc_stop(CARD_NO, axisNo, 0);              //减速停止
+    iRet[axisNo] = smc_stop(CARD_NO, axisNo, 0);              //减速停止
   }
   return;
 }
@@ -498,9 +500,9 @@ void MainWindow::on_pushButton_decstop_1_clicked() {
 
 // emgstop
 void MainWindow::on_pushButton_emgstop_0_clicked() {
-  short iret[2] = {0, 0};
+  short iRet[2] = {0, 0};
   for (int i = 0; i < 2; i++) {
-    iret[i] = smc_stop(CARD_NO, i, 0);
+    iRet[i] = smc_stop(CARD_NO, i, 0);
   }
 }
 void MainWindow::on_pushButton_emgstop_1_clicked() {
@@ -510,39 +512,41 @@ void MainWindow::on_pushButton_emgstop_1_clicked() {
 // zero pos
 void MainWindow::on_pushButton_zeropos_clicked() {
   short axisNo = 0;
-  short iret = 0;
+  short iRet = 0;
+  double posToSet = 0;
   if (ui->checkBox_axis_l->isChecked()) {
     axisNo = 0;
-    iret = smc_set_position_unit(0, axisNo, 0);
+    iRet = smc_set_position_unit(CARD_NO, axisNo, posToSet);
   }
   if (ui->checkBox_axis_r->isChecked()) {
     axisNo = 1;
-    iret = smc_set_position_unit(0, axisNo, 0);
+    iRet = smc_set_position_unit(CARD_NO, axisNo, posToSet);
   }
 }
 // enc pos
 void MainWindow::on_pushButton_encpos_clicked() {
   short axisNo = 0;
-  short iret = 0;
+  short iRet = 0;
+  double posToSet = 0;
   if (ui->checkBox_axis_l->isChecked()) {
     axisNo = 0;
-    iret = smc_set_encoder_unit(0, axisNo, 0);
+    iRet = smc_set_encoder_unit(CARD_NO, axisNo, posToSet);
   }
   if (ui->checkBox_axis_r->isChecked()) {
     axisNo = 1;
-    iret = smc_set_encoder_unit(0, axisNo, 0);
+    iRet = smc_set_encoder_unit(CARD_NO, axisNo, posToSet);
   }
 }
 // stop crd
 void MainWindow::on_pushButton_stopcrd_clicked() {
-  short iret = 0;
-  iret = smc_stop_multicoor(0, 0, 0);
-  iret = smc_stop_multicoor(0, 1, 0);
+  short iRet = 0;
+  iRet = smc_stop_multicoor(CARD_NO, 0, 0);
+  iRet = smc_stop_multicoor(CARD_NO, 1, 0);
 }
 // change vel
 void MainWindow::on_pushButton_changevel_clicked() {
   WORD axisNo = 0;
-  short iret = 0;
+  short iRet = 0;
   double runvel[2] = {ui->textEdit_runvel_0->toPlainText().toDouble(), ui->textEdit_runvel_1->toPlainText().toDouble()};
   vel_limit(runvel);  //限制每个轮子的最大线速度为0.8m/s
   ui->textEdit_runvel_0->setText(QString::number(runvel[0], 'f', 3));
@@ -552,7 +556,7 @@ void MainWindow::on_pushButton_changevel_clicked() {
   double actuvel[2];
   double time[2];
   for (int i = 0; i < 2; i++) {
-    iret = smc_read_current_speed_unit(0, i, &actuvel[i]);
+    iRet = smc_read_current_speed_unit(0, i, &actuvel[i]);
     double diff = fabs(runvel[i] - actuvel[i]);
     if (diff < 10000) {
       time[i] = 0;  //如果差值diff<10000,则时间为0
@@ -563,27 +567,27 @@ void MainWindow::on_pushButton_changevel_clicked() {
 
   if (ui->checkBox_axis_l->isChecked()) {
     axisNo = 0;
-    iret = smc_change_speed_unit(0, axisNo, runvel[0], time[0]);
+    iRet = smc_change_speed_unit(CARD_NO, axisNo, runvel[0], time[0]);
   }
   if (ui->checkBox_axis_r->isChecked()) {
     axisNo = 1;
-    iret = smc_change_speed_unit(0, axisNo, runvel[1], time[1]);
+    iRet = smc_change_speed_unit(CARD_NO, axisNo, runvel[1], time[1]);
   }
 }
 // change pos
 void MainWindow::on_pushButton_changepos_clicked() {
   WORD axisNo = 0;
-  short iret = 0;
+  short iRet = 0;
   double destpos[2] = {ui->textEdit_destpos_0->toPlainText().toDouble(),
                        ui->textEdit_destpos_1->toPlainText().toDouble()};
 
   if (ui->checkBox_axis_l->isChecked()) {
     axisNo = 0;
-    iret = smc_reset_target_position_unit(0, axisNo, destpos[0]);
+    iRet = smc_reset_target_position_unit(CARD_NO, axisNo, destpos[0]);
   }
   if (ui->checkBox_axis_r->isChecked()) {
     axisNo = 1;
-    iret = smc_reset_target_position_unit(0, axisNo, destpos[1]);
+    iRet = smc_reset_target_position_unit(CARD_NO, axisNo, destpos[1]);
   }
 }
 
@@ -720,7 +724,7 @@ void MainWindow::on_pushButton_start_wc_clicked() {
       move_axis(Wheel::left);
       move_axis(Wheel::right);
 
-      while (smc_check_done(0, 0) == 0 || smc_check_done(0, 1) == 0) {
+      while (smc_check_done(CARD_NO, (WORD)Wheel::left) == 0 || smc_check_done(CARD_NO, (WORD)Wheel::right) == 0) {
         system("pause");
       }
     }
@@ -736,7 +740,7 @@ void MainWindow::on_pushButton_changevel_wc_clicked() {
 
   v_wheels = trans * v_chairs;  //由轮椅速度反解出电机速度
 
-  short iret[2] = {0, 0};
+  short iRet[2] = {0, 0};
   double runvel[2] = {-v_wheels(1, 0), -v_wheels(0, 0)};  //左轮为0号电机,右轮为1号电机
   vel_limit(runvel);                                      //限制每个轮子的最大线速度为0.8m/s
 
@@ -744,7 +748,7 @@ void MainWindow::on_pushButton_changevel_wc_clicked() {
   double actuvel[2];
   double time[2];
   for (int i = 0; i < 2; i++) {
-    iret[i] = smc_read_current_speed_unit(0, i, &actuvel[i]);
+    iRet[i] = smc_read_current_speed_unit(CARD_NO, i, &actuvel[i]);
     double diff = fabs(runvel[i] - actuvel[i]);
     if (diff < 20000) {
       time[i] = 0;
@@ -754,7 +758,7 @@ void MainWindow::on_pushButton_changevel_wc_clicked() {
   }
 
   for (int i = 0; i < 2; i++) {
-    iret[i] = smc_change_speed_unit(0, i, runvel[i], time[i]);
+    iRet[i] = smc_change_speed_unit(CARD_NO, i, runvel[i], time[i]);
   }
 }
 
