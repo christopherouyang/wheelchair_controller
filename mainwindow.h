@@ -89,13 +89,12 @@ class MainWindow : public QMainWindow {
   void get_moving_status(Wheel axisNo, double *runvel, double *pulse);
   void move_axis(Wheel axisNo);
 
+  void calculate_motor_vel(Eigen::Vector2d &motorVel);
   void get_fixed_length_parameter(double runvel[][2], double pulse[][2]);
 
   void emg_stop();
 
   MovingStatus status[2];
-
-  Eigen::MatrixXd transMatrix;
 
  public:
   void RefreshUI();

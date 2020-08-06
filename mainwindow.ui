@@ -1292,7 +1292,7 @@ QGroupBox::title {
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_goal_theta">
+    <widget class="QTextEdit" name="textEdit_destAngle">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -1305,7 +1305,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_goal_x">
+    <widget class="QTextEdit" name="textEdit_destX">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -1318,7 +1318,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_goal_y">
+    <widget class="QTextEdit" name="textEdit_destY">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1395,7 +1395,7 @@ QGroupBox::title {
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_goal_dtheta">
+    <widget class="QTextEdit" name="textEdit_moving_angularVel">
      <property name="geometry">
       <rect>
        <x>240</x>
@@ -1408,7 +1408,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_goal_dv">
+    <widget class="QTextEdit" name="textEdit_moving_linearVel">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -1553,15 +1553,15 @@ QGroupBox::title {
     <zorder>textEdit_angular_current_vel</zorder>
     <zorder>label_14</zorder>
     <zorder>label_15</zorder>
-    <zorder>textEdit_goal_theta</zorder>
-    <zorder>textEdit_goal_x</zorder>
-    <zorder>textEdit_goal_y</zorder>
+    <zorder>textEdit_destAngle</zorder>
+    <zorder>textEdit_destX</zorder>
+    <zorder>textEdit_destY</zorder>
     <zorder>label_25</zorder>
     <zorder>label_39</zorder>
     <zorder>label_40</zorder>
     <zorder>label_41</zorder>
-    <zorder>textEdit_goal_dtheta</zorder>
-    <zorder>textEdit_goal_dv</zorder>
+    <zorder>textEdit_moving_angularVel</zorder>
+    <zorder>textEdit_moving_linearVel</zorder>
     <zorder>label_43</zorder>
     <zorder>label_44</zorder>
    </widget>
