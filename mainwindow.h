@@ -14,12 +14,12 @@ class MainWindow;
 }
 
 struct MovingStatus {
-  double startvel;
-  double runvel;
-  double stopvel;
-  double acctime;
-  double dectime;
-  double stime;
+  double startVel;
+  double runVel;
+  double stopVel;
+  double accTime;
+  double decTime;
+  double sTime;
   double pulse;
   int direction;
   MovingMode mode;
@@ -90,9 +90,10 @@ class MainWindow : public QMainWindow {
   bool enable_axis(int axisNo);
   bool disable_axis(int axisNo);
 
-  void get_status(Wheel axisNo, double *runvel, double *pulse);
-
+  void get_moving_status(Wheel axisNo, double *runvel, double *pulse);
   void move_axis(Wheel axisNo);
+
+  void get_fixed_length_parameter(double runvel[][2], double pulse[][2]);
 
   void emg_stop();
 

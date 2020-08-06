@@ -5,9 +5,15 @@ enum class Direction { forward = 0, backward = 1 };
 
 enum class MovingMode { standby = 0, fixedLength = 1, constantSpeed = 2 };
 
+enum class PulseMoveMOde { relative = 0, absolute = 1 };
+
+enum class StopMode { decStop = 0, emgStop = 1 };
+
 enum class Wheel { left = 0, right = 1 };
 
 enum class AxisEnableStatus { on = 0, off = 1 };
+
+enum class AxisMovingStatus { moving = 0, resting = 1 };
 
 enum class SignalEnableStatus { disable = 0, enable = 1 };
 

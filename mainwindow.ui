@@ -52,7 +52,7 @@ QGroupBox::title {
       <string>Startvel</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_startvel_0">
+    <widget class="QTextEdit" name="textEdit_startVel_0">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -78,7 +78,7 @@ QGroupBox::title {
       <string>Runvel</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_runvel_0">
+    <widget class="QTextEdit" name="textEdit_runVel_0">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -91,7 +91,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stopvel_0">
+    <widget class="QTextEdit" name="textEdit_stopVel_0">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -117,7 +117,7 @@ QGroupBox::title {
       <string>Stopvel</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_acctime_0">
+    <widget class="QTextEdit" name="textEdit_accTime_0">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -143,7 +143,7 @@ QGroupBox::title {
       <string>Acctime</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_dectime_0">
+    <widget class="QTextEdit" name="textEdit_decTime_0">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -169,7 +169,7 @@ QGroupBox::title {
       <string>Dectime</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_destpos_0">
+    <widget class="QTextEdit" name="textEdit_destPos_0">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -208,7 +208,7 @@ QGroupBox::title {
       <string>Stime</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stime_0">
+    <widget class="QTextEdit" name="textEdit_sTime_0">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -260,7 +260,7 @@ QGroupBox::title {
       <string>Direction</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_startvel_1">
+    <widget class="QTextEdit" name="textEdit_startVel_1">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -273,7 +273,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_runvel_1">
+    <widget class="QTextEdit" name="textEdit_runVel_1">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -286,7 +286,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stopvel_1">
+    <widget class="QTextEdit" name="textEdit_stopVel_1">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -299,7 +299,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_stime_1">
+    <widget class="QTextEdit" name="textEdit_sTime_1">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -312,7 +312,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_acctime_1">
+    <widget class="QTextEdit" name="textEdit_accTime_1">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -325,7 +325,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_dectime_1">
+    <widget class="QTextEdit" name="textEdit_decTime_1">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -351,7 +351,7 @@ QGroupBox::title {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_destpos_1">
+    <widget class="QTextEdit" name="textEdit_destPos_1">
      <property name="geometry">
       <rect>
        <x>550</x>
@@ -565,30 +565,30 @@ QGroupBox::title {
     <zorder>groupBox_6</zorder>
     <zorder>groupBox_5</zorder>
     <zorder>label_4</zorder>
-    <zorder>textEdit_startvel_0</zorder>
+    <zorder>textEdit_startVel_0</zorder>
     <zorder>label_5</zorder>
-    <zorder>textEdit_runvel_0</zorder>
-    <zorder>textEdit_stopvel_0</zorder>
+    <zorder>textEdit_runVel_0</zorder>
+    <zorder>textEdit_stopVel_0</zorder>
     <zorder>label_6</zorder>
-    <zorder>textEdit_acctime_0</zorder>
+    <zorder>textEdit_accTime_0</zorder>
     <zorder>label_7</zorder>
-    <zorder>textEdit_dectime_0</zorder>
+    <zorder>textEdit_decTime_0</zorder>
     <zorder>label_8</zorder>
-    <zorder>textEdit_destpos_0</zorder>
+    <zorder>textEdit_destPos_0</zorder>
     <zorder>label_9</zorder>
     <zorder>label_10</zorder>
-    <zorder>textEdit_stime_0</zorder>
+    <zorder>textEdit_sTime_0</zorder>
     <zorder>label_20</zorder>
     <zorder>textEdit_pulse_0</zorder>
     <zorder>label_21</zorder>
-    <zorder>textEdit_startvel_1</zorder>
-    <zorder>textEdit_runvel_1</zorder>
-    <zorder>textEdit_stopvel_1</zorder>
-    <zorder>textEdit_stime_1</zorder>
-    <zorder>textEdit_acctime_1</zorder>
-    <zorder>textEdit_dectime_1</zorder>
+    <zorder>textEdit_startVel_1</zorder>
+    <zorder>textEdit_runVel_1</zorder>
+    <zorder>textEdit_stopVel_1</zorder>
+    <zorder>textEdit_sTime_1</zorder>
+    <zorder>textEdit_accTime_1</zorder>
+    <zorder>textEdit_decTime_1</zorder>
     <zorder>textEdit_pulse_1</zorder>
-    <zorder>textEdit_destpos_1</zorder>
+    <zorder>textEdit_destPos_1</zorder>
     <zorder>label_27</zorder>
     <zorder>label_28</zorder>
     <zorder>label_29</zorder>
