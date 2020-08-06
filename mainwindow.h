@@ -35,7 +35,6 @@ class MainWindow : public QMainWindow {
  private slots:
 
   void on_pushButton_openio_clicked();
-
   void on_pushButton_closeio_clicked();
 
   void on_pushButton_start_0_clicked();
@@ -47,18 +46,15 @@ class MainWindow : public QMainWindow {
   void on_pushButton_emgstop_1_clicked();
 
   void on_pushButton_zeropos_clicked();
-
   void on_pushButton_encpos_clicked();
 
   void on_pushButton_stopcrd_clicked();
 
+  void on_pushButton_enable_clicked();
   bool on_pushButton_disable_clicked();
 
   void on_pushButton_changevel_clicked();
-
   void on_pushButton_changepos_clicked();
-
-  void on_pushButton_enable_clicked();
 
   void on_pushButton_exit_0_clicked();
   void on_pushButton_exit_1_clicked();
@@ -66,7 +62,6 @@ class MainWindow : public QMainWindow {
   void on_pushButton_start_wc_clicked();
 
   void on_pushButton_changevel_wc_clicked();
-
   void on_pushButton_changepos_wc_clicked();
 
   //    void on_radioButton_fl_1_clicked();
@@ -80,6 +75,7 @@ class MainWindow : public QMainWindow {
   Ui::MainWindow *ui;
   void timerEvent(QTimerEvent *e);
   void initDialog();
+
   void information_connection_fail();
   void information_connection_success();
   void information_disable();
@@ -99,7 +95,7 @@ class MainWindow : public QMainWindow {
 
   MovingStatus status[2];
 
-  Eigen::MatrixXd trans;
+  Eigen::MatrixXd transMatrix;
 
  public:
   void RefreshUI();

@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string>
 
+// const parameter for the controller board
 static short borad_init_status = (short)ConnectionStatus::unconnected;
 constexpr WORD CARD_NO = 0;
 constexpr WORD EMG_STOP_BIT_NO = 0;
@@ -16,14 +17,22 @@ constexpr WORD S_MODE = 0;
 constexpr WORD DEFAULT_PULSE_OUTMODE = 0;
 constexpr WORD DEFAULT_ALARM_ACTION = 0;
 constexpr double PULSE_PER_UNIT = 1;
+constexpr double PULSE_PER_LOOP = 320000;
+constexpr double UNIT_PER_LOOP = PULSE_PER_LOOP / PULSE_PER_UNIT;
+constexpr int INTERVAL_IN_MILLI_SECOND = 200;
+
+// const paramter in math
+constexpr double PI = 3.1415926358;
+constexpr double RADIAN_TO_ANGULAR = 180 / PI;
+constexpr double ANGULAR_TO_RADIAN = PI / 180;
 
 // const parameter for the wheelchair
 constexpr double RADIUS = 0.164;
-constexpr double SPACE = 0.552;
-constexpr double PI = 3.1415926358;
-constexpr double COEFF = (2 * PI * RADIUS / 320000);
+constexpr double WHEEL_BASE = 0.552;
+constexpr double HALF_WHEEL_BASE = WHEEL_BASE / 2;
+constexpr double UNIT_PER_METER = UNIT_PER_LOOP / (2 * PI * RADIUS);
 constexpr double MAX_VEL = 0.8;
-constexpr double VEL_LIMIT = MAX_VEL / COEFF;
+constexpr double VEL_LIMIT = MAX_VEL * UNIT_PER_METER;
 
 static void vel_limit(double *runVel) {
   //将两轮的速度限制在0.8m/s之内
@@ -61,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   char pIpAddress[] = "192.168.5.11";
 
   borad_init_status = smc_board_init(CARD_NO, (WORD)ConnectType::ethercat, pIpAddress, 0);
-  if (borad_init_status != (short)ConnectionStatus::connected) {  //检查控制卡是否连接成功
+  if (borad_init_status != (short)ConnectionStatus::connected) {
     qDebug("smc_board_init iRet = %d\n", borad_init_status);
     qDebug("连接失败！请检查控制卡的连接");
     information_connection_fail();
@@ -69,15 +78,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     qDebug("控制卡连接成功！");
     information_connection_success();
   }
+  transMatrix(0, 0) = UNIT_PER_METER;
+  transMatrix(1, 0) = UNIT_PER_METER;
+  transMatrix(0, 1) = UNIT_PER_METER * HALF_WHEEL_BASE;
+  transMatrix(1, 1) = -UNIT_PER_METER * HALF_WHEEL_BASE;
 
-  Eigen::MatrixXd trans_2(2, 2);
-  trans_2(0, 0) = 1;
-  trans_2(0, 1) = SPACE / 2;
-  trans_2(1, 0) = 1;
-  trans_2(1, 1) = -SPACE / 2;
-  trans = trans_2 / COEFF;
-
-  startTimer(200);  //定义类QTimerEvent的刷新时间(ms)
+  startTimer(INTERVAL_IN_MILLI_SECOND);
 }
 
 void MainWindow::information_connection_fail() {
@@ -180,8 +186,8 @@ void MainWindow::timerEvent(QTimerEvent *e) {
     iRet[i] = smc_get_axis_run_mode(CARD_NO, i, &movingmode[i]);
   }
   //由每个轮子的速度获取轮椅速度，负号是因为电机正方向对应的是轮椅的后退反向
-  linear_v = -(speed[0] + speed[1]) * COEFF / 2;
-  angular_v = -(speed[1] - speed[0]) * COEFF / SPACE * 180 / PI;
+  linear_v = -(speed[0] + speed[1]) / UNIT_PER_METER / 2;
+  angular_v = -(speed[1] - speed[0]) / UNIT_PER_METER / WHEEL_BASE * RADIAN_TO_ANGULAR;
 
   ui->label_status_0->setText(StatusInfo(status[0]));
   ui->label_status_0->setText(StatusInfo(status[1]));
@@ -528,7 +534,7 @@ void MainWindow::on_pushButton_stopcrd_clicked() {
 }
 // change vel
 void MainWindow::on_pushButton_changevel_clicked() {
-  WORD axisNo = 0;
+  WORD axisNo[2] = {(WORD)Wheel::left, (WORD)Wheel::right};
   short iRet = 0;
   double runVel[2] = {ui->textEdit_runVel_0->toPlainText().toDouble(), ui->textEdit_runVel_1->toPlainText().toDouble()};
   vel_limit(runVel);  //限制每个轮子的最大线速度为0.8m/s
@@ -539,7 +545,7 @@ void MainWindow::on_pushButton_changevel_clicked() {
   double actuvel[2];
   double time[2];
   for (int i = 0; i < 2; i++) {
-    iRet = smc_read_current_speed_unit(0, i, &actuvel[i]);
+    iRet = smc_read_current_speed_unit(CARD_NO, i, &actuvel[i]);
     double diff = fabs(runVel[i] - actuvel[i]);
     if (diff < 10000) {
       time[i] = 0;  //如果差值diff<10000,则时间为0
@@ -549,12 +555,10 @@ void MainWindow::on_pushButton_changevel_clicked() {
   }
 
   if (ui->checkBox_axis_l->isChecked()) {
-    axisNo = 0;
-    iRet = smc_change_speed_unit(CARD_NO, axisNo, runVel[0], time[0]);
+    iRet = smc_change_speed_unit(CARD_NO, axisNo[0], runVel[0], time[0]);
   }
   if (ui->checkBox_axis_r->isChecked()) {
-    axisNo = 1;
-    iRet = smc_change_speed_unit(CARD_NO, axisNo, runVel[1], time[1]);
+    iRet = smc_change_speed_unit(CARD_NO, axisNo[0], runVel[1], time[1]);
   }
 }
 // change pos
@@ -591,20 +595,14 @@ void MainWindow::on_pushButton_exit_1_clicked() {
 }
 
 void MainWindow::on_pushButton_start_wc_clicked() {
-  //定义轮椅速度向量
   Eigen::MatrixXd v_wheels(2, 1);
   Eigen::MatrixXd v_chairs(2, 1);
 
   v_chairs(0, 0) = ui->textEdit_linear_vel->toPlainText().toDouble();
-  v_chairs(1, 0) = ui->textEdit_angular_vel->toPlainText().toDouble() / 180 * PI;
+  v_chairs(1, 0) = ui->textEdit_angular_vel->toPlainText().toDouble() * ANGULAR_TO_RADIAN;
+  v_wheels = transMatrix * v_chairs;  //由轮椅速度反解出电机速度
 
-  v_wheels = trans * v_chairs;  //由轮椅速度反解出电机速度
-
-  double runVel[3][2] = {
-      {0, 0},
-      {v_wheels(1, 0), v_wheels(0, 0)},  //左轮为0号电机,右轮为1号电机
-      {0, 0},
-  };
+  double runVel[3][2] = {{0, 0}, {v_wheels(1, 0), v_wheels(0, 0)}, {0, 0}};
   double pulse[3][2] = {{0, 0}, {0, 0}, {0, 0}};
   //限制每个轮子的最大线速度为0.8m/s
 
@@ -647,13 +645,12 @@ void MainWindow::on_pushButton_changevel_wc_clicked() {
   Eigen::MatrixXd v_wheels(2, 1);
   Eigen::MatrixXd v_chairs(2, 1);
   v_chairs(0, 0) = ui->textEdit_linear_vel->toPlainText().toDouble();
-  v_chairs(1, 0) = ui->textEdit_angular_vel->toPlainText().toDouble() / 180 * PI;
-
-  v_wheels = trans * v_chairs;  //由轮椅速度反解出电机速度
+  v_chairs(1, 0) = ui->textEdit_angular_vel->toPlainText().toDouble() * ANGULAR_TO_RADIAN;
+  v_wheels = transMatrix * v_chairs;  //由轮椅速度反解出电机速度
 
   short iRet[2] = {0, 0};
-  double runVel[2] = {-v_wheels(1, 0), -v_wheels(0, 0)};  //左轮为0号电机,右轮为1号电机
-  vel_limit(runVel);                                      //限制每个轮子的最大线速度为0.8m/s
+  double runVel[2] = {v_wheels(1, 0), v_wheels(0, 0)};  //左轮为0号电机,右轮为1号电机
+  vel_limit(runVel);                                    //限制每个轮子的最大线速度为0.8m/s
 
   //根据变速前后的速度差值决定变速的时间
   double actuvel[2];
@@ -661,7 +658,7 @@ void MainWindow::on_pushButton_changevel_wc_clicked() {
   for (int i = 0; i < 2; i++) {
     iRet[i] = smc_read_current_speed_unit(CARD_NO, i, &actuvel[i]);
     double diff = fabs(runVel[i] - actuvel[i]);
-    if (diff < 20000) {
+    if (diff < 10000) {
       time[i] = 0;
     } else {
       time[i] = diff / 100000;
@@ -678,11 +675,12 @@ void MainWindow::on_pushButton_changepos_wc_clicked() {
 
 void MainWindow::get_fixed_length_parameter(double runVel[][2], double pulse[][2]) {
   //定义电机在轮椅直线运动时的速度大小
-  runVel[1][0] = fabs(ui->textEdit_goal_dv->toPlainText().toDouble() / COEFF);
+  runVel[1][0] = fabs(ui->textEdit_goal_dv->toPlainText().toDouble() * UNIT_PER_METER);
   runVel[1][1] = runVel[1][0];
   //定义电机在轮椅旋转时的速度大小
   for (int i = 0; i < 3; i = i + 2) {
-    runVel[i][0] = fabs(ui->textEdit_goal_dtheta->toPlainText().toDouble() * PI / 180 * SPACE / COEFF / 2);
+    runVel[i][0] =
+        fabs(ui->textEdit_goal_dtheta->toPlainText().toDouble() * ANGULAR_TO_RADIAN * HALF_WHEEL_BASE * UNIT_PER_METER);
     runVel[1][1] = runVel[i][0];
   }
 
@@ -690,7 +688,7 @@ void MainWindow::get_fixed_length_parameter(double runVel[][2], double pulse[][2
   double goal_x = ui->textEdit_goal_x->toPlainText().toDouble();
   double goal_y = ui->textEdit_goal_y->toPlainText().toDouble();
   //获取目标的轮椅角度,并且保证它的取值范围是(-pi,pi]
-  double goal_theta = ui->textEdit_goal_theta->toPlainText().toDouble() / 180 * PI;
+  double goal_theta = ui->textEdit_goal_theta->toPlainText().toDouble() * ANGULAR_TO_RADIAN;
   while (goal_theta > PI) {
     goal_theta = goal_theta - 2 * PI;
   }
@@ -718,7 +716,7 @@ void MainWindow::get_fixed_length_parameter(double runVel[][2], double pulse[][2
   theta_chairs_1(1, 0) = delta_theta;
 
   Eigen::MatrixXd pulse_wheels_1(2, 1);
-  pulse_wheels_1 = trans * theta_chairs_1;
+  pulse_wheels_1 = transMatrix * theta_chairs_1;
 
   //如果目标角度和连线角度之间的差值的绝对值大于pi,则将其补回(-pi,pi]的区间内
   if (goal_theta - delta_theta > PI) {
@@ -731,15 +729,15 @@ void MainWindow::get_fixed_length_parameter(double runVel[][2], double pulse[][2
   theta_chairs_2(1, 0) = goal_theta - delta_theta;
 
   Eigen::MatrixXd pulse_wheels_2(2, 1);
-  pulse_wheels_2 = trans * theta_chairs_2;
+  pulse_wheels_2 = transMatrix * theta_chairs_2;
 
   // step 1:轮椅转到面向终点位置（x,y)的方向
   pulse[0][0] = pulse_wheels_1(1, 0);
   pulse[0][1] = pulse_wheels_1(0, 0);  //左轮为0号电机,右轮为1号电机
 
   // step 2:轮椅沿直线运动到终点位置（x,y)
-  pulse[1][0] = dist / COEFF;
-  pulse[1][1] = dist / COEFF;
+  pulse[1][0] = dist * UNIT_PER_METER;
+  pulse[1][1] = dist * UNIT_PER_METER;
 
   // step 3:轮椅调整到目标角度goal_theta
   pulse[2][0] = pulse_wheels_2(1, 0);
