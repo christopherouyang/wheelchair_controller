@@ -3,19 +3,17 @@
 
 #include <QThread>
 
+class MyThread : public QThread {
+  Q_OBJECT
+ public:
+  explicit MyThread(QObject *parent = 0);
 
-class MyThread : public QThread
-{
-    Q_OBJECT
-public:
-    explicit MyThread(QObject *parent = 0);
+ public:
+  void run();
+  void stop();
 
-public:
-    void run();
-    void stop();
-private:
-    volatile bool stopped;
-
+ private:
+  volatile bool stopped;
 };
 
-#endif // MYTHREAD_H
+#endif  // MYTHREAD_H

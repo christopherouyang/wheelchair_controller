@@ -1,15 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "LTSMC.h"
+#include "math.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <eigen3/Eigen/Dense>
-#include "math.h"
 #include <unistd.h>
 #include <string>
+#include <iostream>
 
 // const parameter for the controller board
 static short borad_init_status = (short)ConnectionStatus::unconnected;
+const std::string IP_ADDR = "192.168.0.9";
 constexpr WORD CARD_NO = 0;
 constexpr WORD EMG_STOP_BIT_NO = 0;
 constexpr DWORD ERROR_CODE_SUCCESS = 0;
@@ -69,7 +71,7 @@ static QString StatusInfo(DWORD status) {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   initDialog();
-  char pIpAddress[] = "192.168.5.11";
+  char *pIpAddress = (char *)IP_ADDR.c_str();
 
   borad_init_status = smc_board_init(CARD_NO, (WORD)ConnectType::ethercat, pIpAddress, 0);
   if (borad_init_status != (short)ConnectionStatus::connected) {
@@ -611,7 +613,7 @@ void MainWindow::on_pushButton_start_wc_clicked() {
 
       while (smc_check_done(CARD_NO, (WORD)Wheel::left) == (short)AxisMovingStatus::moving ||
              smc_check_done(CARD_NO, (WORD)Wheel::right) == (short)AxisMovingStatus::moving) {
-        system("pause");
+        pause();
       }
     }
   }
