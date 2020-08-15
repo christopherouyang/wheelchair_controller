@@ -6,7 +6,7 @@ AlignAfterOpenBracket: Align
 AllowShortFunctionsOnASingleLine: false
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: Left
+#AlignEscapedNewlines: left
 AlignOperands:   true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
@@ -34,20 +34,20 @@ BraceWrapping:
   BeforeElse:      false
   IndentBraces:    false
   #SplitEmptyFunction: true
-  SplitEmptyRecord: true
-  SplitEmptyNamespace: true
+  #SplitEmptyRecord: true
+  #SplitEmptyNamespace: true
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
-BreakBeforeInheritanceComma: false
+#BreakBeforeInheritanceComma: false
 #BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
-BreakConstructorInitializers: BeforeColon
+#BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ColumnLimit:     120
 CommentPragmas:  '^ IWYU pragma:'
-CompactNamespaces: false
+#CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
@@ -55,7 +55,7 @@ Cpp11BracedListStyle: true
 DerivePointerAlignment: true
 DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
-FixNamespaceComments: true
+#FixNamespaceComments: true
 ForEachMacros:   
   - foreach
   - Q_FOREACH
@@ -70,13 +70,13 @@ IncludeCategories:
     Priority:        2
   - Regex:           '.*'
     Priority:        3
-IncludeIsMainRegex: '([-_](test|unittest))?$'
+#IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: true
 #IndentPPDirectives: None
 IndentWidth:     2
 IndentWrappedFunctionNames: false
-JavaScriptQuotes: Leave
-JavaScriptWrapImports: true
+#JavaScriptQuotes: Leave
+#JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
@@ -86,7 +86,7 @@ NamespaceIndentation: None
 ObjCBlockIndentWidth: 2
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
-PenaltyBreakAssignment: 2
+#PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 1
 PenaltyBreakComment: 300
 PenaltyBreakFirstLessLess: 120
@@ -97,7 +97,7 @@ PenaltyReturnTypeOnItsOwnLine: 200
 PointerAlignment: Left
 ReflowComments:  true
 SortIncludes:    false
-SortUsingDeclarations: true
+#SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
@@ -125,7 +125,7 @@ AlignAfterOpenBracket: Align
 AllowShortFunctionsOnASingleLine: false
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: Left
+#AlignEscapedNewlines: Left
 AlignOperands:   true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
@@ -153,20 +153,20 @@ BraceWrapping:
   BeforeElse:      false
   IndentBraces:    false
   #SplitEmptyFunction: true
-  SplitEmptyRecord: true
-  SplitEmptyNamespace: true
+  #SplitEmptyRecord: true
+  #SplitEmptyNamespace: true
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
-BreakBeforeInheritanceComma: false
+#BreakBeforeInheritanceComma: false
 #BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
-BreakConstructorInitializers: BeforeColon
+#BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ColumnLimit:     120
 CommentPragmas:  '^ IWYU pragma:'
-CompactNamespaces: false
+#CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
@@ -174,7 +174,7 @@ Cpp11BracedListStyle: true
 DerivePointerAlignment: true
 DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
-FixNamespaceComments: true
+#FixNamespaceComments: true
 ForEachMacros:   
   - foreach
   - Q_FOREACH
@@ -205,7 +205,7 @@ NamespaceIndentation: None
 ObjCBlockIndentWidth: 2
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
-PenaltyBreakAssignment: 2
+#PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 1
 PenaltyBreakComment: 300
 PenaltyBreakFirstLessLess: 120
@@ -217,7 +217,7 @@ PointerAlignment: Left
 
 ReflowComments:  true
 SortIncludes:    false
-SortUsingDeclarations: true
+#SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true

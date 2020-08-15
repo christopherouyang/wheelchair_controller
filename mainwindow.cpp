@@ -588,9 +588,6 @@ void MainWindow::on_pushButton_start_wc_clicked() {
   ui->radioButton_fw_0->click();
   ui->radioButton_fw_1->click();  //默认前进
 
-  WORD axisNo[2] = {0, 1};
-  short statemachine[2] = {1, 1};
-
   if (smc_check_done(CARD_NO, (WORD)Wheel::left) == (short)AxisMovingStatus::moving ||
       smc_check_done(CARD_NO, (WORD)Wheel::right) == (short)AxisMovingStatus::moving) {  //该轴已经在运动中
     return;
