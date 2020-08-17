@@ -10,7 +10,7 @@
 #include <iostream>
 
 // const parameter for the controller board
-static short borad_init_status = (short)ConnectionStatus::unconnected;
+static short boardInitRes = (short)BoradInitResult::unconnected;
 const std::string IP_ADDR = "192.168.0.9";
 constexpr WORD CARD_NO = 0;
 constexpr WORD EMG_STOP_BIT_NO = 0;
@@ -18,6 +18,7 @@ constexpr DWORD ERROR_CODE_SUCCESS = 0;
 constexpr WORD S_MODE = 0;
 constexpr WORD DEFAULT_PULSE_OUTMODE = 0;
 constexpr WORD DEFAULT_ALARM_ACTION = 0;
+constexpr DWORD DEFAULT_TIMEOUT = 0;
 constexpr double PULSE_PER_UNIT = 1;
 constexpr double PULSE_PER_LOOP = 320000;
 constexpr double UNIT_PER_LOOP = PULSE_PER_LOOP / PULSE_PER_UNIT;
@@ -46,7 +47,7 @@ static void vel_limit(double *runVel) {
   }
 }
 
-static QString MovingModeInfo(WORD movingmode) {
+static QString GetMovingModeInfo(WORD movingmode) {
   QString info;
   switch (movingmode) {
     case (WORD)MovingMode::standby:
@@ -64,7 +65,7 @@ static QString MovingModeInfo(WORD movingmode) {
   return info;
 }
 
-static QString StatusInfo(DWORD status) {
+static QString GetAxisMovingStatusInfo(DWORD status) {
   return (status != 1) ? "Running" : "Static";
 }
 
@@ -73,9 +74,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   initDialog();
   char *pIpAddress = (char *)IP_ADDR.c_str();
 
-  borad_init_status = smc_board_init(CARD_NO, (WORD)ConnectType::ethercat, pIpAddress, 0);
-  if (borad_init_status != (short)ConnectionStatus::connected) {
-    qDebug("smc_board_init iRet = %d\n", borad_init_status);
+  boardInitRes = smc_board_init(CARD_NO, (WORD)ConnectType::ethercat, pIpAddress, 0);
+  if (boardInitRes != (short)BoradInitResult::connected) {
+    qDebug("smc_board_init result = %d\n", boardInitRes);
     qDebug("连接失败！请检查控制卡的连接");
     information_connection_fail();
   } else {
@@ -175,9 +176,8 @@ void MainWindow::timerEvent(QTimerEvent *e) {
   double speed[2] = {0.0, 0.0};
   double linear_v = 0;
   double angular_v = 0;
-  DWORD status[2] = {1, 1};
-  WORD movingmode[2] = {0, 0};
-  QString info;
+  DWORD status[2] = {(DWORD)AxisMovingStatus::resting, (DWORD)AxisMovingStatus::resting};
+  WORD movingmode[2] = {(WORD)MovingMode::standby, (WORD)MovingMode::standby};
 
   for (int i = 0; i < 2; i++) {
     iRet[i] = smc_get_position_unit(CARD_NO, i, &pos[i]);
@@ -190,11 +190,11 @@ void MainWindow::timerEvent(QTimerEvent *e) {
   linear_v = -(speed[0] + speed[1]) / UNIT_PER_METER / 2;
   angular_v = -(speed[1] - speed[0]) / UNIT_PER_METER / WHEEL_BASE * RADIAN_TO_ANGULAR;
 
-  ui->label_status_0->setText(StatusInfo(status[0]));
-  ui->label_status_0->setText(StatusInfo(status[1]));
+  ui->label_status_0->setText(GetAxisMovingStatusInfo(status[0]));
+  ui->label_status_0->setText(GetAxisMovingStatusInfo(status[1]));
 
-  ui->label_mode_0->setText(MovingModeInfo(movingmode[0]));
-  ui->label_mode_1->setText(MovingModeInfo(movingmode[1]));
+  ui->label_mode_0->setText(GetMovingModeInfo(movingmode[0]));
+  ui->label_mode_1->setText(GetMovingModeInfo(movingmode[1]));
 
   ui->textEdit_prfPosX->setText(QString::number(pos[0], 'f', 3));
   ui->textEdit_prfPosY->setText(QString::number(pos[1], 'f', 3));
@@ -208,12 +208,12 @@ void MainWindow::timerEvent(QTimerEvent *e) {
   ui->textEdit_linear_current_vel->setText(QString::number(linear_v, 'f', 3));
   ui->textEdit_angular_current_vel->setText(QString::number(angular_v, 'f', 3));
 
-  short timeout = smc_set_connect_timeout(0);
-  short status_connect = smc_get_connect_status(CARD_NO);  //读取实时的连接状态
+  short timeout = smc_set_connect_timeout(DEFAULT_TIMEOUT);
+  short connectStatus = smc_get_connect_status(CARD_NO);  //读取实时的连接状态
 
-  if (borad_init_status == 0) {
-    emg_stop();               //与控制器连接成功时调用IO急停信号
-    if (status_connect != 1)  //如果连接失败,则立刻急停
+  if (boardInitRes == (short)BoradInitResult::connected) {
+    emg_stop();                                               //与控制器连接成功时调用IO急停信号
+    if (connectStatus != (short)ConnectionStatus::connected)  //如果连接失败,则立刻急停
     {
       for (int i = 0; i < 2; i++) {
         iRet[i] = smc_stop(CARD_NO, i, (WORD)StopMode::emgStop);
@@ -223,7 +223,7 @@ void MainWindow::timerEvent(QTimerEvent *e) {
     }
   }
 
-  // printf("连接延时%d ms,连接状态%d\n",timeout,status_connect);
+  // printf("连接延时%d ms,连接状态%d\n",timeout,connectStatus);
 
   // connect(ui->slider_linear_vel,SIGNAL(valueChanged(int)),ui->textEdit_linear_vel,SLOT(setText(QString::number(int,'f',3))));
   // ui->slider_linear_vel->sliderReleased();
@@ -563,7 +563,7 @@ void MainWindow::on_pushButton_changepos_clicked() {
 
 // exit board&application
 void MainWindow::on_pushButton_exit_0_clicked() {
-  if (borad_init_status == (short)ConnectionStatus::connected) {
+  if (boardInitRes == (short)BoradInitResult::connected) {
     if (!MainWindow::on_pushButton_disable_clicked()) {
       printf("warning: disable axis falied");
       return;

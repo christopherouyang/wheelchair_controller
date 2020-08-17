@@ -21,7 +21,9 @@ enum class ElectricalLevel { low = 0, high = 1 };
 
 enum class ConnectType { serialPort = 1, ethercat = 2 };
 
-enum class ConnectionStatus { unconnected = -1, connected = 0 };
+enum class BoradInitResult { unconnected = -1, connected = 0 };
+
+enum class ConnectionStatus { unconnected = 0, connected = 1 };
 
 enum class IoStatus { on = 0, off = 1 };
 
